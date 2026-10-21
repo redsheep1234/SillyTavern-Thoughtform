@@ -218,6 +218,8 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
     await expect(page.locator('#chat')).toContainText('keeps the coat closed');
 
     await page.locator('#stsv-send-btn').click();
+    await page.locator('[data-bind="outputMode"]').selectOption('video');
+    await expect(page.locator('#stsv-make')).toHaveText('Make my video');
     await expect(page.locator('#stsv-cost')).toContainText('AUD');
     await page.locator('[data-bind="consistency"]').evaluate((el) => {
         el.value = 'keyframe';
@@ -274,15 +276,17 @@ test('Images only stops after stills and Picture this moment posts one', async (
     await page.waitForFunction(() => Boolean(globalThis.SillyTavern?.getContext), null, { timeout: 90000 });
     await dismissWelcome(page);
 
-    const chatFile = `sera-stills-${Date.now()}`;
-    const created = await page.evaluate(async (fileName) => {
+    const stamp = Date.now();
+    const chatFile = `sera-stills-${stamp}`;
+    const charName = `Sera Still ${stamp}`;
+    const created = await page.evaluate(async ({ fileName, charName }) => {
         const context = globalThis.SillyTavern.getContext();
         const headers = { ...(context.getRequestHeaders?.() || {}) };
         delete headers['Content-Type'];
         delete headers['content-type'];
         const body = new FormData();
-        body.set('ch_name', 'Sera Still');
-        body.set('file_name', 'Sera_Still');
+        body.set('ch_name', charName);
+        body.set('file_name', charName.replace(/\s+/g, '_'));
         body.set('description', 'Short silver bob, amber eyes, dark green raincoat.');
         body.set('personality', 'Speaks plainly.');
         body.set('scenario', 'A wet street.');
@@ -294,7 +298,7 @@ test('Images only stops after stills and Picture this moment posts one', async (
         const chat = [
             { chat_metadata: {} },
             { name: 'Sera Voss', is_user: true, mes: 'The rain is warm. Walk with me.', send_date: 'October 21, 2026' },
-            { name: 'Sera Still', is_user: false, mes: 'She keeps the coat closed and looks back.', send_date: 'October 21, 2026' },
+            { name: charName, is_user: false, mes: 'She keeps the coat closed and looks back.', send_date: 'October 21, 2026' },
         ];
         const saved = await fetch('/api/chats/save', {
             method: 'POST',
@@ -303,13 +307,13 @@ test('Images only stops after stills and Picture this moment posts one', async (
         });
         if (!saved.ok) throw new Error(`chat save failed ${saved.status} ${await saved.text()}`);
         return { avatar };
-    }, chatFile);
+    }, { fileName: chatFile, charName });
     expect(created.avatar).toContain('Sera');
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => Boolean(globalThis.SillyTavern?.getContext), null, { timeout: 90000 });
     await dismissWelcome(page);
-    const card = page.locator('.character_select').filter({ hasText: 'Sera Still' }).first();
+    const card = page.locator('.character_select').filter({ hasText: charName }).first();
     await expect(card).toHaveCount(1, { timeout: 30000 });
     await card.evaluate((row) => row.click());
     await page.evaluate(async (fileName) => {
@@ -347,6 +351,11 @@ test('Images only stops after stills and Picture this moment posts one', async (
     await expect(line.locator('.mes_img')).toBeVisible({ timeout: 20000 });
     await page.locator('#stsv-close').click();
     await line.screenshot({ path: '/opt/cursor/artifacts/screenshots/picture-this-moment-1.png' });
+    await page.evaluate(() => {
+        const context = globalThis.SillyTavern.getContext();
+        if (context?.extensionSettings?.scene_video) context.extensionSettings.scene_video.outputMode = 'video';
+        context?.saveSettingsDebounced?.();
+    });
 
     const ours = errors.filter((entry) => /stsv|scene-video|Scene Video/i.test(entry));
     expect(ours, ours.join('\n')).toEqual([]);
