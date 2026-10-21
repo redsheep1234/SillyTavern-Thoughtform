@@ -34,7 +34,18 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
     await expect(page.locator('#stsv-board')).toContainText('market uniform');
     await expect(page.locator('#stsv-board')).toContainText('Create related character');
+    await expect(page.locator('#stsv-board')).toContainText('Generate a live-action avatar');
     await expect(page.locator('[data-step="cast"]')).toContainText('Style lock');
+    await page.getByRole('button', { name: 'Generate a live-action avatar' }).first().click();
+    await expect(page.locator('#stsv-variant-text')).toBeVisible();
+    const brief = await page.locator('#stsv-variant-text').inputValue();
+    expect(brief.length).toBeGreaterThan(10);
+    expect(brief.trim().startsWith('{')).toBeFalsy();
+    await page.getByRole('button', { name: 'Generate avatar from text' }).click();
+    await expect(page.locator('.stsv-studio img')).toBeVisible();
+    await page.locator('.stsv-studio').screenshot({ path: `${shots}/variant-1.png` });
+    await page.getByRole('button', { name: 'Approve', exact: true }).click();
+    await expect(page.locator('#stsv-board')).toContainText('Live-action avatar');
     await page.locator('#stsv-board').scrollIntoViewIfNeeded();
     await page.locator('#stsv-board').screenshot({ path: `${shots}/cast-1.png` });
 

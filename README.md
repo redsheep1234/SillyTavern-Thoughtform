@@ -144,6 +144,8 @@ Group shots place each person on the left, in the center, or on the right, and r
 
 **Style lock** on Cast and look is prepended to every still and video prompt. Leave it blank to use the style default ("2D anime, cel-shaded…" for anime). **Create related character** on a board seeds a parent, sibling, child, or partner and sends the source board as style and family-resemblance references.
 
+**Generate a live-action avatar** or **Generate an anime avatar** writes a feature description from the card, then draws that avatar from the text alone. The other style's pictures are not sent, which avoids the glossy semi-3D look of feeding a drawing in as a reference. Approve the still and it is stored on that style's set. Outfits, keyframes, and video use the set that matches the project style. File the original stills with "These stills are" so the source set stays attached to anime or live action.
+
 If a host refuses an outfit prompt, the error names the refusal and tells you to edit the prompt or switch provider.
 
 ## Debug
