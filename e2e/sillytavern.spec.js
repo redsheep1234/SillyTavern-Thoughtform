@@ -341,7 +341,7 @@ test('Images only stops after stills and Picture this moment posts one', async (
 
     await page.locator('#stsv-close').click();
     const line = page.locator('#chat .mes', { hasText: 'Walk with me' }).first();
-    await line.locator('.stsv-pic-btn').click({ force: true });
+    await line.locator('.stsv-pic-btn').evaluate((button) => button.click());
     await expect(page.locator('#stsv-status')).toContainText(/Stills are ready|cached/, { timeout: 90000 });
     await expect(page.locator('.stsv-shot')).toHaveCount(1);
     await expect(line.locator('.mes_img')).toBeVisible({ timeout: 20000 });
