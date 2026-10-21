@@ -1,31 +1,31 @@
 const chat = [
-    { name: 'Lumen Quill', is_user: true, is_system: false, mes: 'The night market is open. Aki, walk with me to the bridge.' },
-    { name: 'Aki Vale', is_user: false, is_system: false, force_avatar: '/docs/examples/lumen-happy.jpg', mes: 'Aki pulls the indigo coat tighter and nods toward the wet street.' },
-    { name: 'Ren Moss', is_user: false, is_system: false, force_avatar: '/docs/examples/lumen-turn-side.jpg', mes: 'Ren stays by the lantern stall and keeps the paper cranes dry.' },
-    { name: 'Lumen Quill', is_user: true, is_system: false, mes: 'Ren is quiet now. Aki, the bridge is ours.' },
-    { name: 'Aki Vale', is_user: false, is_system: false, force_avatar: '/docs/examples/lumen-happy.jpg', mes: 'Aki puts on the market uniform and steps onto the bridge.' },
-    { name: 'Sable Orr', is_user: false, is_system: false, force_avatar: '/docs/examples/lumen-uniform.jpg', mes: 'Sable joins at the paper-crane stall, already in a market uniform, and lifts one crane.' },
-    { name: 'Lumen Quill', is_user: true, is_system: false, mes: 'Sable, that uniform is the same cut as Aki’s, but the crane is yours.' },
+    { name: 'Sera Voss', is_user: true, is_system: false, mes: 'The night market is open. Aki, walk with me to the bridge.' },
+    { name: 'Aki Vale', is_user: false, is_system: false, force_avatar: '/docs/examples/aki.jpg', mes: 'Aki pulls the indigo coat tighter and nods toward the wet street.' },
+    { name: 'Ren Moss', is_user: false, is_system: false, force_avatar: '/docs/examples/ren.jpg', mes: 'Ren stays by the lantern stall and keeps the paper cranes dry.' },
+    { name: 'Sera Voss', is_user: true, is_system: false, mes: 'Ren is quiet now. Aki, the bridge is ours.' },
+    { name: 'Aki Vale', is_user: false, is_system: false, force_avatar: '/docs/examples/aki.jpg', mes: 'Aki puts on the market uniform and steps onto the bridge.' },
+    { name: 'Sable Orr', is_user: false, is_system: false, force_avatar: '/docs/examples/sable.jpg', mes: 'Sable joins at the paper-crane stall, already in a market uniform, and lifts one crane.' },
+    { name: 'Sera Voss', is_user: true, is_system: false, mes: 'Sable, that uniform is the same cut as Aki’s, but the crane is yours.' },
 ];
 
 const characters = [
     {
         name: 'Aki Vale',
-        avatar: '/docs/examples/lumen-happy.jpg',
+        avatar: '/docs/examples/aki.jpg',
         description: 'Short teal braid, square paper lantern on a strap, indigo coat with moth-shaped clasps.',
         personality: 'Speaks after looking.',
         scenario: 'Night market regular.',
     },
     {
         name: 'Ren Moss',
-        avatar: '/docs/examples/lumen-turn-side.jpg',
+        avatar: '/docs/examples/ren.jpg',
         description: 'Cropped copper hair, round glasses, olive scarf, keeps both hands around a crate.',
         personality: 'Muted in this scene, still present at the stall.',
         scenario: 'Stall keeper.',
     },
     {
         name: 'Sable Orr',
-        avatar: '/docs/examples/lumen-uniform.jpg',
+        avatar: '/docs/examples/sable.jpg',
         description: 'Long black coat, silver ear cuff, arrives mid-market with a paper crane.',
         personality: 'Joins late and talks with their hands.',
         scenario: 'Visiting the stall.',
@@ -33,35 +33,35 @@ const characters = [
 ];
 
 const context = {
-    name1: 'Lumen Quill',
+    name1: 'Sera Voss',
     name2: 'Aki Vale',
     characterId: null,
     groupId: 'market-night',
     groups: [{
         id: 'market-night',
         name: 'Night market',
-        members: ['/docs/examples/lumen-happy.jpg', '/docs/examples/lumen-turn-side.jpg', '/docs/examples/lumen-uniform.jpg'],
-        disabled_members: ['/docs/examples/lumen-turn-side.jpg'],
+        members: ['/docs/examples/aki.jpg', '/docs/examples/ren.jpg', '/docs/examples/sable.jpg'],
+        disabled_members: ['/docs/examples/ren.jpg'],
     }],
     chatId: 'preview-group',
     chat,
     characters,
     powerUserSettings: {
-        persona_description: 'Lumen Quill wears a moth-cloak and carries a square lantern. Original character, not a real person.',
-        user_avatar: '/docs/examples/lumen-neutral.jpg',
+        persona_description: 'Sera Voss has a short silver bob, amber eyes, and a dark green raincoat. Fixture character, not a real person.',
+        user_avatar: '/docs/examples/sera-neutral.jpg',
         personas: {
-            '/docs/examples/lumen-neutral.jpg': 'Lumen Quill',
-            '/docs/examples/lumen-turn-back.jpg': 'Night Clerk',
+            '/docs/examples/sera-neutral.jpg': 'Sera Voss',
+            '/docs/examples/sera-turn-back.jpg': 'Night Clerk',
         },
         persona_descriptions: {
-            '/docs/examples/lumen-neutral.jpg': 'Moth-cloak, square lantern, teal braid.',
-            '/docs/examples/lumen-turn-back.jpg': 'Apron, ink-stained cuffs, no lantern.',
+            '/docs/examples/sera-neutral.jpg': 'Short silver bob, amber eyes, dark green raincoat.',
+            '/docs/examples/sera-turn-back.jpg': 'Apron, ink-stained cuffs, no raincoat.',
         },
     },
     extensionSettings: {
         tts: {
             voiceMap: {
-                'Lumen Quill': 'lumen-warm',
+                'Sera Voss': 'sera-warm',
                 'Aki Vale': 'aki-low',
                 'Ren Moss': 'ren-soft',
                 'Sable Orr': 'sable-bright',
@@ -120,11 +120,11 @@ const context = {
             scenes: [
                 {
                     title: 'Bridge',
-                    prompt: 'Lumen Quill and Aki Vale walk a wet lantern-lit bridge. Aki wears an indigo coat.',
+                    prompt: 'Sera Voss and Aki Vale walk a wet lantern-lit bridge. Aki wears an indigo coat.',
                     camera: 'Wide shot, slow push in',
                     duration: 5,
-                    characters: ['Lumen Quill', 'Aki Vale'],
-                    dialogue: 'Lumen Quill: The night market is open.\nAki Vale: Aki nods toward the wet street.',
+                    characters: ['Sera Voss', 'Aki Vale'],
+                    dialogue: 'Sera Voss: The night market is open.\nAki Vale: Aki nods toward the wet street.',
                     outfits: [
                         { character: 'Aki Vale', outfit: 'indigo coat', description: 'Indigo coat with moth clasps', change: false },
                     ],
@@ -134,8 +134,8 @@ const context = {
                     prompt: 'Aki puts on the market uniform at the bridge. Sable joins in a different market uniform and lifts a paper crane.',
                     camera: 'Medium shot',
                     duration: 5,
-                    characters: ['Aki Vale', 'Sable Orr', 'Lumen Quill'],
-                    dialogue: 'Aki Vale: Aki puts on the market uniform.\nSable Orr: Sable lifts one crane.\nLumen Quill: That uniform is the same cut, but the crane is yours.',
+                    characters: ['Aki Vale', 'Sable Orr', 'Sera Voss'],
+                    dialogue: 'Aki Vale: Aki puts on the market uniform.\nSable Orr: Sable lifts one crane.\nSera Voss: That uniform is the same cut, but the crane is yours.',
                     outfits: [
                         { character: 'Aki Vale', outfit: 'market uniform', description: 'Ochre market apron over the coat', change: true },
                         { character: 'Sable Orr', outfit: 'market uniform', description: 'Black market apron and silver ear cuff', change: true },
@@ -190,44 +190,48 @@ window.$ = (element) => element;
 await import('../index.js');
 const { openPanel } = await import('../lib/panel.js');
 openPanel();
-seedLumenBoard();
+seedSeraBoard();
 
-function seedLumenBoard() {
+function seedSeraBoard() {
     const library = context.extensionSettings.scene_video.library;
-    const record = Object.values(library.records).find((item) => item.name === 'Lumen Quill');
+    const record = Object.values(library.records).find((item) => item.name === 'Sera Voss');
     if (!record) return;
     const stills = [
-        ['neutral', ['expression', 'face'], 'neutral'],
-        ['happy', ['expression', 'face'], 'joy'],
-        ['laughing', ['expression', 'face'], 'amusement'],
-        ['sad', ['expression', 'face'], 'sadness'],
-        ['angry', ['expression', 'face'], 'anger'],
-        ['surprised', ['expression', 'face'], 'surprise'],
-        ['turn-front', ['turnaround', 'full body'], ''],
-        ['turn-side', ['turnaround', 'full body'], ''],
-        ['turn-back', ['turnaround', 'full body'], ''],
-        ['uniform', ['outfit', 'full body'], ''],
+        ['neutral', ['expression', 'face'], 'neutral', ''],
+        ['smile', ['expression', 'face'], 'joy', ''],
+        ['laugh', ['expression', 'face'], 'amusement', ''],
+        ['sad', ['expression', 'face'], 'sadness', ''],
+        ['angry', ['expression', 'face'], 'anger', ''],
+        ['surprised', ['expression', 'face'], 'surprise', ''],
+        ['blush', ['expression', 'face'], 'embarrassment', ''],
+        ['wink', ['expression', 'face'], 'amusement', ''],
+        ['turn-front', ['turnaround', 'full body'], '', ''],
+        ['turn-three-quarter', ['turnaround', 'full body'], '', ''],
+        ['turn-side', ['turnaround', 'full body'], '', ''],
+        ['turn-back', ['turnaround', 'full body'], '', ''],
+        ['coral', ['outfit', 'full body'], '', 'coral'],
+        ['emerald', ['outfit', 'full body'], '', 'emerald'],
     ];
-    for (const [stem, tags, stLabel] of stills) {
+    for (const [stem, tags, stLabel, outfitId] of stills) {
         record.images.push({
             id: `demo-${stem}`,
             dataUrl: '',
-            url: `/docs/examples/lumen-${stem}.jpg`,
+            url: `/docs/examples/sera-${stem}.jpg`,
             tags,
-            label: stem.replace('turn-', '').replace('-', ' '),
+            label: stem.replace('turn-', '').replaceAll('-', ' '),
             source: 'generated',
             avatar: '',
-            outfitId: stem === 'uniform' ? 'market-uniform' : '',
-            prompt: 'Lumen Quill, same lantern, braid, and coat.',
+            outfitId,
+            prompt: 'Sera Voss, short silver bob, amber eyes.',
             stLabel,
         });
     }
     record.primaryId = 'demo-neutral';
-    record.outfits.push({
-        id: 'market-uniform',
-        name: 'market uniform',
-        description: 'Ochre apron over the indigo coat. The lantern stays.',
-    });
+    record.sourceMedium = 'anime';
+    record.outfits.push(
+        { id: 'coral', name: 'coral sarong', description: 'Coral bikini and a sarong tied at the hip.' },
+        { id: 'emerald', name: 'emerald dress', description: 'Dark emerald satin slip dress.' },
+    );
     record.defaultOutfitId = '';
-    record.appearance = 'Original character. Sand-colored face, teal braid, indigo coat, square lantern. Not a real person.';
+    record.appearance = 'Short silver bob, amber eyes, dark green raincoat. Fixture character, not a real person.';
 }

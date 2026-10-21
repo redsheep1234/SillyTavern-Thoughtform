@@ -89,7 +89,7 @@ test('a related character borrows the source board and an older description', ()
 test('shot lists are told to place a group, and a refusal names the outfit', () => {
     const request = buildShotListRequest({
         messages: [{ id: 0, name: 'Mara', text: 'Come on.' }],
-        cast: { user: { name: 'Lumen' }, characters: [] },
+        cast: { user: { name: 'Sera' }, characters: [] },
         settings: { style: 'anime', themeId: 'cel-90s', sceneCount: 0, secondsPerScene: 5 },
     });
     assert.match(request.systemPrompt, /on the left/);

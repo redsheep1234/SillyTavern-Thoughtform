@@ -20,7 +20,7 @@ const roster = [
 
 function groupContext(chat) {
     return {
-        name1: 'Lumen Quill',
+        name1: 'Sera Voss',
         groupId: 'market-night',
         groups: [{
             id: 'market-night',
@@ -32,17 +32,17 @@ function groupContext(chat) {
         chat,
         powerUserSettings: {
             persona_description: 'Moth-cloak and a square lantern.',
-            user_avatar: 'lumen.png',
-            personas: { 'lumen.png': 'Lumen Quill' },
+            user_avatar: 'sera.png',
+            personas: { 'sera.png': 'Sera Voss' },
         },
     };
 }
 
 const chat = [
-    { name: 'Lumen Quill', is_user: true, mes: 'Aki, walk with me.' },
+    { name: 'Sera Voss', is_user: true, mes: 'Aki, walk with me.' },
     { name: 'Aki Vale', is_user: false, force_avatar: 'aki.png', mes: 'Aki nods.' },
     { name: 'Ren Moss', is_user: false, force_avatar: 'ren.png', mes: 'Ren keeps the cranes dry.' },
-    { name: 'Lumen Quill', is_user: true, mes: 'Ren stays muted after this.' },
+    { name: 'Sera Voss', is_user: true, mes: 'Ren stays muted after this.' },
     { name: 'Aki Vale', is_user: false, force_avatar: 'aki.png', mes: 'Aki puts on the market uniform.' },
     { name: 'Sable Orr', is_user: false, force_avatar: 'sable.png', mes: 'Sable joins and lifts a crane.' },
 ];
@@ -53,7 +53,7 @@ test('a group keeps muted, late, and guest members on separate cards', () => {
     assert.equal(cast.characters.find((item) => item.name === 'Ren Moss').muted, true);
     assert.equal(cast.characters.find((item) => item.name === 'Sable Orr').muted, false);
     const early = castForMessages(cast, [
-        { name: 'Lumen Quill', isUser: true, text: 'Aki, walk with me.' },
+        { name: 'Sera Voss', isUser: true, text: 'Aki, walk with me.' },
         { name: 'Aki Vale', isUser: false, text: 'Aki nods.' },
     ]);
     assert.equal(early.characters.some((item) => item.name === 'Ren Moss'), false);
@@ -78,7 +78,7 @@ test('local shots and subtitles keep each speaker', () => {
     }));
     const scenes = localShotList(messages, { ...defaultSettings, sceneCount: 3 });
     const speakers = scenes.flatMap((scene) => scene.lines.map((line) => line.speaker));
-    assert.deepEqual([...new Set(speakers)], ['Lumen Quill', 'Aki Vale', 'Ren Moss', 'Sable Orr']);
+    assert.deepEqual([...new Set(speakers)], ['Sera Voss', 'Aki Vale', 'Ren Moss', 'Sable Orr']);
     const join = scenes.find((scene) => scene.lines.some((line) => line.speaker === 'Sable Orr'));
     assert.equal(join.characters.includes('Ren Moss'), false);
     assert.equal(join.characters.includes('Sable Orr'), true);
@@ -87,7 +87,7 @@ test('local shots and subtitles keep each speaker', () => {
     const cues = speakerCues(scenes);
     assert.ok(cues.some((cue) => cue.text.startsWith('Aki Vale:')));
     assert.ok(cues.some((cue) => cue.text.startsWith('Sable Orr:')));
-    assert.ok(cues.some((cue) => cue.text.startsWith('Lumen Quill:')));
+    assert.ok(cues.some((cue) => cue.text.startsWith('Sera Voss:')));
     const parsed = parseShotList(JSON.stringify({
         scenes: [{
             title: 'Stall',
@@ -98,7 +98,7 @@ test('local shots and subtitles keep each speaker', () => {
         }],
     }));
     assert.deepEqual(parsed[0].lines.map((line) => line.speaker), ['Aki Vale', 'Sable Orr']);
-    const voices = { voiceMap: { 'Aki Vale': 'aki-low', 'Sable Orr': 'sable-bright', 'Lumen Quill': 'lumen-warm' } };
+    const voices = { voiceMap: { 'Aki Vale': 'aki-low', 'Sable Orr': 'sable-bright', 'Sera Voss': 'sera-warm' } };
     const lines = dialogueLines(parsed);
     assert.deepEqual(lines.map((line) => voiceFor(line.speaker, voices)), ['aki-low', 'sable-bright']);
     const built = buildShotListRequest({
@@ -125,8 +125,8 @@ test('the same outfit name stays on the character who changed', () => {
     const scenes = [
         {
             title: 'Walk',
-            prompt: 'Aki Vale walks with Lumen.',
-            characters: ['Aki Vale', 'Lumen Quill'],
+            prompt: 'Aki Vale walks with Sera.',
+            characters: ['Aki Vale', 'Sera Voss'],
             outfits: [],
         },
         {
@@ -137,8 +137,8 @@ test('the same outfit name stays on the character who changed', () => {
         },
     ];
     const tracked = trackOutfits(scenes, Object.values(library.records), {
-        persona: { id: 'lumen.png', name: 'Lumen Quill', boardKey: 'persona:lumen.png' },
-        userName: 'Lumen Quill',
+        persona: { id: 'sera.png', name: 'Sera Voss', boardKey: 'persona:sera.png' },
+        userName: 'Sera Voss',
     });
     const akiFirst = tracked.scenes[0].cast.find((member) => member.name === 'Aki Vale');
     const akiSecond = tracked.scenes[1].cast.find((member) => member.name === 'Aki Vale');
