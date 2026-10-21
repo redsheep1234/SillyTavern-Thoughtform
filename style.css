@@ -195,6 +195,35 @@
     margin: 10px 0;
 }
 
+.stsv-budget,
+.stsv-related,
+.stsv-advanced,
+.stsv-outfit {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    border-radius: 12px;
+}
+
+.stsv-budget input[type="range"],
+.stsv-advanced input[type="range"] {
+    width: min(100%, 280px);
+}
+
+.stsv-primary {
+    font-size: 1.05rem;
+    padding: 10px 18px;
+}
+
+.stsv-scene-cost {
+    font-weight: 600;
+}
+
+.stsv-beat {
+    display: block;
+    margin: 8px 0;
+}
+
 .stsv-messages {
     max-height: 240px;
     overflow: auto;

@@ -23,6 +23,9 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     page.on('pageerror', (error) => errors.push(String(error)));
     await page.goto('http://127.0.0.1:43123/dev/preview.html');
     await expect(page.locator('#stsv-title')).toBeVisible();
+    await expect(page.locator('#stsv-make')).toHaveText('Make my video');
+    await expect(page.locator('#stsv-cost')).toContainText('AUD');
+    await expect(page.getByRole('button', { name: 'Showcase' }).first()).toBeVisible();
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
     await page.locator('#stsv-all').click();
@@ -34,6 +37,10 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
     await expect(page.locator('#stsv-board')).toContainText('market uniform');
     await expect(page.locator('#stsv-board')).toContainText('Create related character');
+    await page.getByRole('button', { name: 'Create related character' }).first().click();
+    await expect(page.getByRole('button', { name: 'Remix' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Regenerate avatar from this description' }).first()).toBeVisible();
+    await expect(page.locator('[data-trait="hair"]').first()).toBeVisible();
     await expect(page.locator('#stsv-board')).toContainText('Generate a live-action avatar');
     await expect(page.locator('[data-step="cast"]')).toContainText('Style lock');
     await page.getByRole('button', { name: 'Generate a live-action avatar' }).first().click();
@@ -55,6 +62,7 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-shots')).toContainText('Adjust prompt');
     await expect(page.locator('#stsv-shots')).toContainText('Redo');
     await expect(page.locator('#stsv-shots')).toContainText('on the left');
+    await expect(page.locator('#stsv-shots')).toContainText('Turn into video');
     await page.locator('#stsv-shots').screenshot({ path: `${shots}/storyboard-1.png` });
 
     await page.locator('[data-step-jump="generate"]').click();

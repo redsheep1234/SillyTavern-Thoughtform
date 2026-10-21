@@ -12,13 +12,17 @@ The film icon next to Send, the extensions menu item **Scene video**, the per-me
 
 Requires SillyTavern 1.13.0 or newer. The shot list can use the model you already connected in SillyTavern, so that step does not need a second key.
 
-## Make a video
+## Make my video
 
-1. Open the panel and tick the messages that belong in the scene. **All**, **None**, **Last N**, and **From / to** are there for long chats.
-2. Pick a style and a theme, and add any extra or negative prompt.
-3. Choose a provider and a quality preset. The footer shows an estimated cost before you send.
-4. **Write shot list**. Edit every prompt, camera line, and duration. **Use local split** does the same split without a model and quotes the chat, so you can see that it is not an LLM pass.
-5. **Generate video**. Clips are stitched in the browser. One clip skips the stitch. Download the result, attach it to the last selected message, or attach it as a new message.
+1. Open the panel. Set a dollar cap in Australian dollars, or a target length. The footer shows a live estimate such as `≈ $2.27 AUD ($1.50 USD), 10 scenes, ~50s` and updates as you change the cap, the look, or the provider. The US dollar figure uses about 0.66 USD per AUD, a rough rate, not a bank quote.
+2. **Make my video** uses that budget, Draft / Standard / Showcase, and moving stills. It stops so you can approve each keyframe. Nothing is filmed until you do.
+3. After the stills, tick **Turn into video** on the scenes that should be real clips. The rest stay as slow pans of the still. The line under the shots is the running total against the cap.
+4. A long selection can be **Short**, **Medium**, or **Full**. Edit the beats, then write the shots. Make my video uses the beats without an extra pause.
+5. Finer controls (resolution, frame rate, steps, model) sit under **Advanced**. Upgrading one scene’s look redoes only that scene.
+
+If a step would pass the cap, generation stops and asks whether to continue. Cached stills and clips show **cached, $0** and are not billed again.
+
+**Write shot list** and **Use local split** are still there when you want to tinker. Local split quotes the chat instead of condensing it.
 
 Closing the panel does not cancel a job. **Cancel** does. If stitching fails, the finished clips can still be downloaded one by one.
 
@@ -30,7 +34,8 @@ Reference stills stay in the current page session. They are scaled to a JPEG aro
 | --- | --- | --- |
 | Draft | about 480p | xAI Grok Imagine Video 1.5 Lite |
 | Standard | about 720p | xAI Grok Imagine Video 1.5 Lite |
-| High | 1080p | xAI Lite, which upscales 720p. OpenRouter's High preset uses Wan 3.0 |
+| Showcase | 1080p | xAI Lite, which upscales 720p. OpenRouter's Showcase preset uses Wan 3.0 |
+| High | same picture as Showcase | Kept so older setups still resolve |
 | Max | premium 1080p | xAI Grok Imagine Video 1.5, or Veo 3.1 on fal / OpenRouter / Replicate |
 
 A preset sets the model, resolution, frame rate, and steps for the provider you have selected. Duration stays what you set, then each provider snaps it to a length that model accepts. Changing the model, resolution, frame rate, or steps by hand switches the preset to Custom.
@@ -138,11 +143,11 @@ A group chat keeps a board, a wardrobe, and a SillyTavern TTS voice for every me
 
 ## Keyframes
 
-The video model follows the approved still more than the reference board. The footer button reads **Generate keyframes** until every still is approved, and that step does not start the video. Each scene shows a large preview, the cast references beside it, an adjustment field (for a note such as "visibly older, 50s"), and **Redo**. Choose "Skip keyframes" only when you want references sent straight to the video model.
+The video model follows the approved still more than the reference board. The footer button reads **Generate keyframes** until every still is approved. With moving stills left on, the next click is **Make the animatic**, not a paid video. Each scene shows a large preview, the cast references beside it, an adjustment field (for a note such as "visibly older, 50s"), and **Redo**. Choose "Skip keyframes" only when you want references sent straight to the video model.
 
 Group shots place each person on the left, in the center, or on the right, and repeat age, hair, and outfit. A group keyframe is drawn after a single still of each person in that outfit.
 
-**Style lock** on Cast and look is prepended to every still and video prompt. Leave it blank to use the style default ("2D anime, cel-shaded…" for anime). **Create related character** on a board seeds a parent, sibling, child, or partner and sends the source board as style and family-resemblance references.
+**Style lock** on Cast and look is prepended to every still and video prompt. Leave it blank to use the style default ("2D anime, cel-shaded…" for anime). **Create related character** on a board seeds a parent, sibling, child, or partner and sends the source board as style and family-resemblance references. After that, the new board is editable on its own: the description, the relationship, and hair, eyes, height, and age. **Regenerate avatar from this description** and **Remix** draw a new still and leave the current one in place until you approve. Redo or Replace on one expression, turnaround, or outfit does not rebuild the rest of the board, and none of these edits change the original character.
 
 **Generate a live-action avatar** or **Generate an anime avatar** writes a feature description from the card, then draws that avatar from the text alone. The other style's pictures are not sent, which avoids the glossy semi-3D look of feeding a drawing in as a reference. Approve the still and it is stored on that style's set. Outfits, keyframes, and video use the set that matches the project style. File the original stills with "These stills are" so the source set stays attached to anime or live action.
 

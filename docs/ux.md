@@ -2,7 +2,11 @@
 
 The panel is one dialog with five steps: Select, Cast and look, Storyboard, Generate, Review. The steps stay visible. Nothing is removed to make the short path shorter.
 
-**Make a video** selects every message when none are ticked and writes a local shot list when you do not have one. It then stops on the keyframe review. Video is a separate click after each still is approved, because the video model follows that still more than the reference board.
+**Make my video** selects every message when none are ticked, fits the scene count and clip length to the Australian dollar cap or the target length, and stops on the keyframe review. The default film is moving stills with captions. Tick **Turn into video** on the scenes that should be real clips. The footer estimate updates as the cap, look, or provider changes, and names cached stills as **cached, $0**. Passing the cap stops and asks before it continues.
+
+Draft, Standard, and Showcase are the looks on the first step. Resolution, frame rate, and model sit under Advanced. A higher look on one scene redoes only that scene.
+
+A long chat can be Short, Medium, or Full. The beats are editable before the shot list. A character made with **Create related character** has its own name, relationship, hair, eyes, height, and age. Remix and per-still Redo keep the previous picture until you approve, and they do not change the original character.
 
 Each shot shows a large keyframe, the cast references beside it, an adjustment field, and Redo. Group shots say who stands on the left and right. Style lock sits on Cast and look and is prepended to every still. Create related character seeds a parent, sibling, child, or partner from the board you are looking at.
 

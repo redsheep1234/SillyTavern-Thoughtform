@@ -125,9 +125,15 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     for (let index = 0; index < shotCount; index += 1) {
         await page.locator('.stsv-shot').nth(index).locator('[data-act="approve-keyframe"]').click();
     }
-    await expect(page.locator('#stsv-generate')).toHaveText('Generate video');
+    await expect(page.locator('#stsv-shots')).toContainText('Turn into video');
+    await expect(page.locator('#stsv-generate')).toHaveText('Make the animatic');
     await page.locator('#stsv-generate').click();
-    await expect(page.locator('#stsv-status')).toContainText(/Video ready|Clip ready/, { timeout: 90000 });
+    await expect(page.locator('#stsv-status')).toContainText('Animatic ready', { timeout: 120000 });
+    await page.locator('[data-step-jump="story"]').click();
+    await page.locator('.stsv-shot').first().locator('[data-field="asVideo"]').check();
+    await expect(page.locator('#stsv-generate')).toHaveText('Make the film');
+    await page.locator('#stsv-generate').click();
+    await expect(page.locator('#stsv-status')).toContainText(/Video ready|Clip ready|Stopped/, { timeout: 120000 });
     await page.screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-review-1.png' });
 
     await page.setViewportSize({ width: 390, height: 844 });
