@@ -124,13 +124,61 @@ Hosted labs still apply their own rules.
 
 API keys are stored in SillyTavern's `extension_settings` (`settings.json` on the server) and in this browser. Anyone who can read that file or this browser profile can read them.
 
-ffmpeg.wasm 0.11.6 is loaded from jsDelivr the first time a multi-clip stitch runs. SillyTavern does not send the headers newer ffmpeg builds require, so this stays on the single-thread build. Audio is dropped during the stitch so mixed clips do not fail the concat. If the CDN is blocked, download the clips separately.
+The first multi-clip stitch loads ffmpeg.wasm 0.11.6 with the single-thread `@ffmpeg/core-st@0.11.1` build from jsDelivr. The default ffmpeg core needs `SharedArrayBuffer`, and SillyTavern does not send the headers that enable it, so the loader calls that core's `main` export instead of `proxy_main`. Audio is dropped during the stitch so mixed clips do not fail the concat. One clip is returned as-is and does not load ffmpeg. If the CDN is blocked, download the clips separately.
+
+## Group chats
+
+A group chat keeps a board, a wardrobe, and a SillyTavern TTS voice for every member, including the user persona. The roster at the top of Select shows who is muted and who has spoken in the messages you ticked.
+
+- A muted member is left out of new shots unless one of the selected messages is already theirs. Their earlier lines stay attributed to them.
+- Someone who joins partway through the chat is tagged with the first message number they speak. Earlier scenes do not include them.
+- A speaker who has left the group is kept as a guest so their lines are not handed to whoever remains.
+- Outfit names are per character. If Aki and Sable both own a "market uniform", only the person named in that sentence changes clothes. A proposed outfit is not saved until you approve it.
+- Dialogue is stored as `Name: line`. Subtitles and the mock voice pass use that speaker, then the SillyTavern voice map.
+
+## Keyframes
+
+The video model follows the approved still more than the reference board. The footer button reads **Generate keyframes** until every still is approved, and that step does not start the video. Each scene shows a large preview, the cast references beside it, an adjustment field (for a note such as "visibly older, 50s"), and **Redo**. Choose "Skip keyframes" only when you want references sent straight to the video model.
+
+Group shots place each person on the left, in the center, or on the right, and repeat age, hair, and outfit. A group keyframe is drawn after a single still of each person in that outfit.
+
+**Style lock** on Cast and look is prepended to every still and video prompt. Leave it blank to use the style default ("2D anime, cel-shaded…" for anime). **Create related character** on a board seeds a parent, sibling, child, or partner and sends the source board as style and family-resemblance references.
+
+If a host refuses an outfit prompt, the error names the refusal and tells you to edit the prompt or switch provider.
+
+## Debug
+
+Turn on **Debug mode** under Generate. The log shows each job's request summary, how long it took, and provider errors in plain language with a fix to try. API keys are removed before anything is stored. **Copy diagnostics** puts the extension version, redacted settings, and the recent log on the clipboard. **Test** buttons call xAI, OpenRouter, fal, ComfyUI, the mock provider, a custom host, and Replicate.
+
+## Troubleshooting
+
+| What you see | What to do |
+| --- | --- |
+| "Select at least one message." | Tick lines on Select, or use All. In a group, muted members with no selected lines are listed but not filmed. |
+| A face is missing from a shot | They joined later, or they are muted. Check the roster note and the "first speaks at" line in the shot-list prompt. |
+| Two people swapped clothes | Outfit names can match. The change follows the sentence that names that person. Approve a proposal before it is saved. |
+| "Add an xAI key" or 401 | Extensions → Scene Video. Keys live in SillyTavern's settings.json and in this browser. |
+| Replicate or another host fails immediately | Turn on `enableCorsProxy: true` or start with `--corsProxy`, then restart. fal, xAI, and OpenRouter do not need the proxy. |
+| ComfyUI does not answer | Start it with `--enable-cors-header *` on a machine you control. Do not publish that port. Load an API-format workflow, not the canvas file. |
+| The stitch mentions SharedArrayBuffer | The extension loads single-thread ffmpeg from jsDelivr on the first multi-clip render. One clip skips ffmpeg. If the CDN is blocked, download the clips separately. |
+| Subtitles credit the wrong person | The line should read `Name: words`. Edit the dialogue box. The local split copies the chat speaker. |
+| The provider refused this prompt | Edit the wording, or the outfit description, and redo the still. Switching provider is the other option. Local ComfyUI does not use that host’s filter. |
+| A face drifted in the video | Approve a keyframe that already looks right. The video uses that still. Add a style lock if a new face jumped mediums. |
+| Copy diagnostics still looks sensitive | Keys and data URLs are redacted. Chat text in a prompt summary is not a key. Delete a line before you send the report if you need to. |
+
+## Example character
+
+`docs/examples/` has Lumen Quill, an original geometric character (sand face, teal braid, indigo coat, square lantern). It is not a real person. The stills are an expression sheet, a turnaround, and one extra outfit. `lumen-likeness.mp4` is a short mock clip that keeps that lantern, braid, and coat. No `OPENROUTER_API_KEY` or `FAL_KEY` was set for this repo, so the example was painted locally instead of billed to a provider. With a key, the same board is sent as reference images to a model that accepts them.
 
 ## Develop
 
 ```bash
-node --test tests/
+npm test
+npm run lint
+npm run e2e
 ```
+
+`npm test` runs `node --test tests/*.mjs`. End-to-end tests need Playwright's Chromium and, for the SillyTavern spec, a local SillyTavern on port 8123. CI runs lint and unit tests only.
 
 `dev/preview.html` is a stub chat that loads the same panel. From the repository root:
 

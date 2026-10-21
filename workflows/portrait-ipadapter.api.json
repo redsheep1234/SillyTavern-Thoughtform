@@ -1,0 +1,85 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": { "ckpt_name": "sd_xl_base_1.0.safetensors" },
+    "_meta": { "title": "Load Checkpoint" }
+  },
+  "2": {
+    "class_type": "IPAdapterModelLoader",
+    "inputs": { "ipadapter_file": "ip-adapter-plus_sdxl_vit-h.safetensors" },
+    "_meta": { "title": "Load IP-Adapter" }
+  },
+  "3": {
+    "class_type": "CLIPVisionLoader",
+    "inputs": { "clip_name": "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors" },
+    "_meta": { "title": "Load CLIP Vision" }
+  },
+  "4": {
+    "class_type": "LoadImage",
+    "inputs": { "image": "avatar.png" },
+    "_meta": { "title": "Reference" }
+  },
+  "5": {
+    "class_type": "IPAdapterAdvanced",
+    "inputs": {
+      "model": ["1", 0],
+      "ipadapter": ["2", 0],
+      "image": ["4", 0],
+      "weight": 0.8,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "clip_vision": ["3", 0]
+    },
+    "_meta": { "title": "IP-Adapter" }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Same person, head and shoulders, plain background.",
+      "clip": ["1", 1]
+    },
+    "_meta": { "title": "Positive Prompt" }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, watermark, extra limbs",
+      "clip": ["1", 1]
+    },
+    "_meta": { "title": "Negative Prompt" }
+  },
+  "8": {
+    "class_type": "EmptyLatentImage",
+    "inputs": { "width": 832, "height": 1216, "batch_size": 1 },
+    "_meta": { "title": "Empty Latent" }
+  },
+  "9": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 24,
+      "cfg": 6,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": ["5", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["8", 0]
+    },
+    "_meta": { "title": "Sampler" }
+  },
+  "10": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["9", 0], "vae": ["1", 2] },
+    "_meta": { "title": "Decode" }
+  },
+  "11": {
+    "class_type": "SaveImage",
+    "inputs": { "filename_prefix": "scene-video-ref", "images": ["10", 0] },
+    "_meta": { "title": "Save Image" }
+  }
+}

@@ -4,6 +4,13 @@
   "type": "module",
   "description": "SillyTavern extension that turns selected chat messages into a scene video.",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test tests/*.mjs",
+    "lint": "eslint .",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "eslint": "^9.39.5",
+    "globals": "^15.15.0"
   }
 }

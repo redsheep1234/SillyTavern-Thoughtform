@@ -12,7 +12,7 @@ import { buildXaiBody, generateXai } from '../lib/providers/xai.js';
 import { applyQualityPreset, getQualityPreset } from '../lib/presets.js';
 import { ensureSettings } from '../lib/settings.js';
 import { buildShotListRequest, localShotList, parseShotList } from '../lib/shotlist.js';
-import { buildXfadeFilter } from '../lib/stitch.js';
+import { buildXfadeFilter, clipSeconds, safeFade } from '../lib/stitch.js';
 import { toProxyUrl } from '../lib/transport.js';
 import { frameCount, getByPath, safeFileName } from '../lib/util.js';
 
@@ -192,6 +192,9 @@ test('settings pick up new provider fields', () => {
 
 test('xfade offset and frame snap', () => {
     assert.match(buildXfadeFilter([5, 5], 0.4), /offset=4\.600/);
+    assert.equal(clipSeconds({ blob: { recordedSeconds: 4 }, duration: 5 }), 4);
+    assert.equal(safeFade([4, 4], 0.4), 0.4);
+    assert.equal(safeFade([1, 4], 0.8), 0);
     assert.equal(frameCount(5, 16), 81);
     assert.equal(safeFileName('../a b.mp4'), '_a_b.mp4');
     assert.equal(getByPath({ a: { b: [{ c: 7 }] } }, 'a.b[0].c'), 7);

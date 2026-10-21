@@ -1,0 +1,110 @@
+{
+  "37": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": { "title": "Load Wan I2V Diffusion Model" }
+  },
+  "38": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    },
+    "_meta": { "title": "Load CLIP" }
+  },
+  "39": {
+    "class_type": "VAELoader",
+    "inputs": { "vae_name": "wan_2.1_vae.safetensors" },
+    "_meta": { "title": "Load VAE" }
+  },
+  "48": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": { "shift": 8, "model": ["37", 0] },
+    "_meta": { "title": "Model Sampling" }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "The same person moves, keeping the face and outfit from the keyframe.",
+      "clip": ["38", 0]
+    },
+    "_meta": { "title": "Positive Prompt" }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, watermark, flickering face",
+      "clip": ["38", 0]
+    },
+    "_meta": { "title": "Negative Prompt" }
+  },
+  "51": {
+    "class_type": "LoadImage",
+    "inputs": { "image": "keyframe.png" },
+    "_meta": { "title": "Keyframe" }
+  },
+  "52": {
+    "class_type": "CLIPVisionLoader",
+    "inputs": { "clip_name": "clip_vision_h.safetensors" },
+    "_meta": { "title": "Load CLIP Vision" }
+  },
+  "53": {
+    "class_type": "CLIPVisionEncode",
+    "inputs": { "clip_vision": ["52", 0], "image": ["51", 0] },
+    "_meta": { "title": "CLIP Vision Encode" }
+  },
+  "54": {
+    "class_type": "WanImageToVideo",
+    "inputs": {
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "vae": ["39", 0],
+      "width": 832,
+      "height": 480,
+      "length": 81,
+      "batch_size": 1,
+      "clip_vision_output": ["53", 0],
+      "start_image": ["51", 0]
+    },
+    "_meta": { "title": "Wan Image To Video" }
+  },
+  "3": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 20,
+      "cfg": 6,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": ["48", 0],
+      "positive": ["54", 0],
+      "negative": ["54", 1],
+      "latent_image": ["54", 2]
+    },
+    "_meta": { "title": "Sampler" }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["3", 0], "vae": ["39", 0] },
+    "_meta": { "title": "Decode" }
+  },
+  "49": {
+    "class_type": "CreateVideo",
+    "inputs": { "fps": 16, "images": ["8", 0] },
+    "_meta": { "title": "Create Video" }
+  },
+  "50": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "filename_prefix": "scene-video",
+      "format": "mp4",
+      "codec": "auto",
+      "video": ["49", 0]
+    },
+    "_meta": { "title": "Save Video" }
+  }
+}
