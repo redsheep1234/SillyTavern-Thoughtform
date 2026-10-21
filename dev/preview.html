@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scene Video preview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Georgia, "Iowan Old Style", serif;
+            background: #12100c;
+            color: #f4efe4;
+        }
+        #top, #send_form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3c3426;
+        }
+        #send_form { border-bottom: 0; border-top: 1px solid #3c3426; }
+        #chat { padding: 8px 16px 48px; }
+        .mes { padding: 12px 0; border-bottom: 1px solid #2a261e; }
+        .mes_buttons { display: flex; gap: 8px; margin-bottom: 6px; }
+        #extensionsMenu { display: flex; gap: 8px; }
+        #extensions_settings { max-width: 720px; padding: 12px 16px 0; }
+    </style>
+</head>
+<body>
+    <div id="top">
+        <strong>Preview chat</strong>
+        <div id="extensionsMenu"></div>
+    </div>
+    <div id="extensions_settings2"></div>
+    <div id="chat"></div>
+    <div id="send_form">
+        <div id="send_but" role="button">Send</div>
+    </div>
+    <script type="module" src="/dev/preview.js"></script>
+</body>
+</html>

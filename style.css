@@ -1,0 +1,345 @@
+.stsv-launch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2em;
+    height: 2.2em;
+    margin: 0 0.25em;
+    cursor: pointer;
+    color: var(--SmartThemeQuoteColor, #e0b15a);
+}
+
+.stsv-msg-btn {
+    cursor: pointer;
+    margin: 0 0.25em;
+    opacity: 0.8;
+    color: var(--SmartThemeQuoteColor, #e0b15a);
+}
+
+.stsv-msg-btn:hover,
+.stsv-launch:hover {
+    opacity: 1;
+}
+
+.stsv-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(8, 7, 5, 0.62);
+}
+
+.stsv-backdrop[hidden] {
+    display: none !important;
+}
+
+.stsv-dialog {
+    width: min(960px, 100%);
+    max-height: min(920px, 100%);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    border-radius: 16px;
+    background: var(--SmartThemeBlurTintColor, #16140f);
+    color: var(--SmartThemeBodyColor, #f4efe4);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.stsv-header,
+.stsv-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 18px;
+}
+
+.stsv-header {
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #3c3426);
+}
+
+.stsv-footer {
+    border-top: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    background: color-mix(in srgb, var(--SmartThemeBlurTintColor, #16140f) 88%, black);
+}
+
+.stsv-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    letter-spacing: 0.01em;
+}
+
+.stsv-header p,
+.stsv-hint,
+.stsv-cost-note,
+#stsv-cost-note,
+#stsv-shot-note {
+    margin: 4px 0 0;
+    color: var(--SmartThemeEmColor, #c8bba6);
+    font-size: 0.92rem;
+}
+
+.stsv-body {
+    overflow: auto;
+    padding: 8px 18px 18px;
+}
+
+.stsv-body section {
+    margin: 16px 0;
+}
+
+.stsv-body h3,
+#stsv-settings h4 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.stsv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.stsv-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.stsv-dialog label,
+#stsv-settings label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.92rem;
+}
+
+.stsv-row > label,
+.stsv-dialog label.stsv-file {
+    flex-direction: row;
+    align-items: center;
+}
+
+.stsv-dialog input,
+.stsv-dialog select,
+.stsv-dialog textarea,
+#stsv-settings .text_pole,
+#stsv-settings textarea,
+#stsv-settings select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--SmartThemeBorderColor, #4a4032);
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--black30a, rgba(0, 0, 0, 0.28));
+    color: inherit;
+    font: inherit;
+}
+
+.stsv-row input,
+.stsv-row select,
+.stsv-dialog label input[type="checkbox"] {
+    width: auto;
+}
+
+.stsv-dialog textarea {
+    resize: vertical;
+    min-height: 64px;
+}
+
+.stsv-dialog button,
+#stsv-settings .menu_button {
+    border: 1px solid var(--SmartThemeBorderColor, #4a4032);
+    border-radius: 999px;
+    padding: 7px 12px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.stsv-dialog button:hover,
+#stsv-settings .menu_button:hover {
+    border-color: var(--SmartThemeQuoteColor, #e0b15a);
+}
+
+.stsv-dialog button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.stsv-primary,
+.stsv-qualities .stsv-on {
+    background: var(--SmartThemeQuoteColor, #e0b15a);
+    color: #1b140b;
+    border-color: transparent;
+}
+
+.stsv-qualities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.stsv-messages {
+    max-height: 240px;
+    overflow: auto;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    border-radius: 12px;
+}
+
+.stsv-message {
+    display: grid;
+    grid-template-columns: auto auto 7rem 1fr;
+    gap: 8px;
+    align-items: baseline;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #3c3426);
+}
+
+.stsv-message:last-child {
+    border-bottom: 0;
+}
+
+.stsv-message-name {
+    font-weight: 600;
+}
+
+.stsv-message-text {
+    opacity: 0.85;
+}
+
+.stsv-shot {
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    border-radius: 12px;
+}
+
+.stsv-shot header,
+.stsv-shot-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+}
+
+.stsv-shot label {
+    margin-top: 8px;
+}
+
+.stsv-empty,
+.stsv-status {
+    color: var(--SmartThemeEmColor, #c8bba6);
+}
+
+.stsv-warn,
+.stsv-error {
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(160, 64, 40, 0.18);
+    color: #ffd0c2;
+}
+
+.stsv-sub {
+    margin-top: 10px;
+}
+
+.stsv-sub[hidden],
+.stsv-warn[hidden],
+.stsv-error[hidden],
+section[hidden] {
+    display: none !important;
+}
+
+#stsv-video {
+    width: 100%;
+    max-height: 420px;
+    border-radius: 12px;
+    background: black;
+}
+
+#stsv-jobs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.stsv-job {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #3c3426);
+}
+
+.stsv-job-done {
+    color: #b7d7a8;
+}
+
+.stsv-job-error {
+    color: #ffb4a4;
+}
+
+#stsv-settings {
+    margin: 8px 0 16px;
+}
+
+#stsv-settings .inline-drawer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#stsv-settings .checkbox_label {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+#stsv-settings .stsv-set-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#stsv-cost {
+    font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+    .stsv-backdrop {
+        padding: 0;
+    }
+
+    .stsv-dialog {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    .stsv-header,
+    .stsv-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .stsv-message {
+        grid-template-columns: auto 1fr;
+    }
+
+    .stsv-message-text {
+        grid-column: 1 / -1;
+    }
+}

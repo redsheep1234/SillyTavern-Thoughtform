@@ -1,0 +1,9 @@
+{
+  "name": "sillytavern-scene-video",
+  "private": true,
+  "type": "module",
+  "description": "SillyTavern extension that turns selected chat messages into a scene video.",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

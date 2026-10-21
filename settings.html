@@ -1,0 +1,61 @@
+<div id="stsv-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Scene Video</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <p>Keys live in SillyTavern's <code>settings.json</code> and in this browser. Treat them like passwords. The film icon beside Send, the extensions menu, and <code>/scenevideo</code> open the panel.</p>
+            <h4>Shot list</h4>
+            <label>Source
+                <select class="text_pole" data-setting="llmSource">
+                    <option value="sillytavern">SillyTavern's connected model</option>
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="openai">OpenAI-compatible endpoint</option>
+                </select>
+            </label>
+            <label>OpenRouter API key <input class="text_pole" data-setting="openrouterKey" type="password" autocomplete="off"></label>
+            <label>OpenRouter text model <input class="text_pole" data-setting="openrouterTextModel" type="text" autocomplete="off"></label>
+            <label>OpenAI-compatible base URL <input class="text_pole" data-setting="openaiBaseUrl" type="text" autocomplete="off"></label>
+            <label>OpenAI-compatible key <input class="text_pole" data-setting="openaiKey" type="password" autocomplete="off"></label>
+            <label>OpenAI-compatible model <input class="text_pole" data-setting="openaiModel" type="text" autocomplete="off"></label>
+            <h4>Video keys</h4>
+            <label>xAI API key <input class="text_pole" data-setting="xaiKey" type="password" autocomplete="off"></label>
+            <label>fal.ai API key <input class="text_pole" data-setting="falKey" type="password" autocomplete="off"></label>
+            <label>Replicate API token <input class="text_pole" data-setting="replicateKey" type="password" autocomplete="off"></label>
+            <p>Replicate needs SillyTavern's CORS proxy (<code>enableCorsProxy: true</code> or <code>--corsProxy</code>). fal, xAI, and OpenRouter are called from the browser. OpenAI Sora 2 and the Gemini API Veo preview are not built in.</p>
+            <label>Browser calls
+                <select class="text_pole" data-setting="corsMode">
+                    <option value="auto">Auto: browser, then SillyTavern proxy</option>
+                    <option value="direct">Browser only</option>
+                    <option value="proxy">SillyTavern proxy only</option>
+                </select>
+            </label>
+            <label class="checkbox_label"><input data-setting="showMessageButton" type="checkbox"> Show the film icon on each message</label>
+            <h4>ComfyUI</h4>
+            <label>URL <input class="text_pole" data-setting="comfyUrl" type="text" autocomplete="off"></label>
+            <div class="stsv-set-row">
+                <button type="button" class="menu_button" data-example="wan-t2v">Load Wan 2.2 example</button>
+                <button type="button" class="menu_button" data-example="ltx-23-t2v">Load LTX-2.3 example</button>
+                <label class="menu_button">Import API JSON <input id="stsv-set-workflow-file" type="file" accept="application/json,.json" hidden></label>
+            </div>
+            <p id="stsv-set-workflow-hint">No workflow loaded. Start ComfyUI with <code>--enable-cors-header *</code> on a machine you control. Do not publish that port.</p>
+            <label>API workflow JSON <textarea class="text_pole" data-setting="comfyWorkflow" rows="8"></textarea></label>
+            <label>Node mapping override <textarea class="text_pole" data-setting="comfyMapping" rows="4" placeholder='{"prompt":{"node":"6","field":"text"}}'></textarea></label>
+            <h4>Custom API</h4>
+            <label>API key <input class="text_pole" data-setting="custom.apiKey" type="password" autocomplete="off"></label>
+            <label>Submit URL <input class="text_pole" data-setting="custom.submitUrl" type="text" autocomplete="off"></label>
+            <label>Poll URL <input class="text_pole" data-setting="custom.pollUrl" type="text" placeholder="https://host/jobs/{{id}}" autocomplete="off"></label>
+            <label>Cancel URL <input class="text_pole" data-setting="custom.cancelUrl" type="text" autocomplete="off"></label>
+            <label>Headers JSON <textarea class="text_pole" data-setting="custom.headers" rows="5"></textarea></label>
+            <label>Body JSON <textarea class="text_pole" data-setting="custom.body" rows="8"></textarea></label>
+            <label>Id path <input class="text_pole" data-setting="custom.idPath" type="text"></label>
+            <label>Status path <input class="text_pole" data-setting="custom.statusPath" type="text"></label>
+            <label>Success statuses <input class="text_pole" data-setting="custom.successStatuses" type="text"></label>
+            <label>Failure statuses <input class="text_pole" data-setting="custom.failureStatuses" type="text"></label>
+            <label>Video path <input class="text_pole" data-setting="custom.videoPath" type="text"></label>
+            <label>Cost per second (estimate only) <input class="text_pole" data-setting="custom.costPerSecond" type="text" placeholder="0.05"></label>
+            <p>Tokens: <code>{{prompt}}</code> <code>{{negative_prompt}}</code> <code>{{duration}}</code> <code>{{aspect_ratio}}</code> <code>{{resolution}}</code> <code>{{fps}}</code> <code>{{steps}}</code> <code>{{seed}}</code> <code>{{width}}</code> <code>{{height}}</code> <code>{{image_url}}</code> <code>{{disable_safety_checker}}</code> <code>{{api_key}}</code>. A value that is only a token keeps its type. Poll URLs may also use <code>{{id}}</code>.</p>
+        </div>
+    </div>
+</div>
