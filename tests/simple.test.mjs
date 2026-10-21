@@ -90,6 +90,54 @@ test('cached scenes are free and a higher look is a different clip', () => {
     assert.notEqual(draft, showcase);
 });
 
+test('images only prices the stills and leaves the video cost at zero', () => {
+    const plan = fitPlan({
+        mode: 'cap',
+        capAud: 5,
+        providerId: 'xai',
+        providerLabel: 'xAI',
+        quality: 'standard',
+        xaiModel: 'grok-imagine-video-1.5-lite',
+        messageCount: 4,
+        derive: true,
+        secondsPerScene: 5,
+        stillUsdEach: 0.04,
+        stillsFirst: true,
+        imagesOnly: true,
+    });
+    assert.equal(plan.sceneCount, 2);
+    assert.equal(plan.usd, 0.08);
+    assert.equal(plan.lines.every((line) => line.asVideo === false && line.videoUsd === 0), true);
+    assert.match(plan.summary, /2 stills/);
+    assert.match(plan.note, /Images only/);
+    const listed = fitPlan({
+        providerId: 'xai',
+        providerLabel: 'xAI',
+        quality: 'standard',
+        xaiModel: 'grok-imagine-video-1.5-lite',
+        stillUsdEach: 0.04,
+        imagesOnly: true,
+        scenes: [
+            { seconds: 5, asVideo: true, cachedStill: false, stills: 1 },
+            { seconds: 5, asVideo: true, cachedStill: true, stills: 1 },
+        ],
+    });
+    assert.equal(listed.lines[0].usd, 0.04);
+    assert.equal(listed.lines[0].videoUsd, 0);
+    assert.equal(listed.lines[1].label, 'cached, $0');
+    assert.equal(listed.usd, 0.04);
+    const unknown = fitPlan({
+        imagesOnly: true,
+        stillUsdEach: null,
+        providerId: 'xai',
+        xaiModel: 'grok-imagine-video-1.5-lite',
+        messageCount: 2,
+        derive: true,
+    });
+    assert.equal(unknown.known, false);
+    assert.match(unknown.summary, /Check provider/);
+});
+
 test('short medium and full beat lists shrink a long chat', () => {
     const messages = Array.from({ length: 12 }, (_, index) => ({
         id: index,

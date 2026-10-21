@@ -263,6 +263,95 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
     expect(ours, ours.join('\n')).toEqual([]);
 });
 
+test('Images only stops after stills and Picture this moment posts one', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(String(error)));
+    page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
+    });
+
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => Boolean(globalThis.SillyTavern?.getContext), null, { timeout: 90000 });
+    await dismissWelcome(page);
+
+    const chatFile = `sera-stills-${Date.now()}`;
+    const created = await page.evaluate(async (fileName) => {
+        const context = globalThis.SillyTavern.getContext();
+        const headers = { ...(context.getRequestHeaders?.() || {}) };
+        delete headers['Content-Type'];
+        delete headers['content-type'];
+        const body = new FormData();
+        body.set('ch_name', 'Sera Still');
+        body.set('file_name', 'Sera_Still');
+        body.set('description', 'Short silver bob, amber eyes, dark green raincoat.');
+        body.set('personality', 'Speaks plainly.');
+        body.set('scenario', 'A wet street.');
+        body.set('first_mes', 'The coat is already on.');
+        const response = await fetch('/api/characters/create', { method: 'POST', headers, body });
+        if (!response.ok) throw new Error(`create failed ${response.status}`);
+        const avatar = (await response.text()).trim();
+        const jsonHeaders = { ...headers, 'Content-Type': 'application/json' };
+        const chat = [
+            { chat_metadata: {} },
+            { name: 'Sera Voss', is_user: true, mes: 'The rain is warm. Walk with me.', send_date: 'October 21, 2026' },
+            { name: 'Sera Still', is_user: false, mes: 'She keeps the coat closed and looks back.', send_date: 'October 21, 2026' },
+        ];
+        const saved = await fetch('/api/chats/save', {
+            method: 'POST',
+            headers: jsonHeaders,
+            body: JSON.stringify({ avatar_url: avatar, file_name: fileName, chat, force: true }),
+        });
+        if (!saved.ok) throw new Error(`chat save failed ${saved.status} ${await saved.text()}`);
+        return { avatar };
+    }, chatFile);
+    expect(created.avatar).toContain('Sera');
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => Boolean(globalThis.SillyTavern?.getContext), null, { timeout: 90000 });
+    await dismissWelcome(page);
+    const card = page.locator('.character_select').filter({ hasText: 'Sera Still' }).first();
+    await expect(card).toHaveCount(1, { timeout: 30000 });
+    await card.evaluate((row) => row.click());
+    await page.evaluate(async (fileName) => {
+        await globalThis.SillyTavern.getContext().openCharacterChat(fileName);
+    }, chatFile);
+    await expect(page.locator('#chat')).toContainText('Walk with me', { timeout: 30000 });
+
+    await page.locator('#stsv-send-btn').click();
+    await page.locator('[data-bind="outputMode"]').selectOption('images');
+    await expect(page.locator('#stsv-make')).toHaveText('Make the pictures');
+    await page.locator('[data-bind="imageModel"]').evaluate((el) => {
+        el.value = 'mock';
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await page.locator('[data-bind="provider"]').evaluate((el) => {
+        el.value = 'mock';
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await expect(page.locator('#stsv-cost-note')).toContainText('Images only');
+    await page.locator('#stsv-make').click();
+    await expect(page.locator('#stsv-status')).toContainText('Stills are ready', { timeout: 90000 });
+    await expect(page.locator('.stsv-keyframe-still').first()).toBeVisible();
+    const [stillDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        page.locator('.stsv-shot').first().locator('[data-act="download-still"]').click(),
+    ]);
+    expect(stillDownload.suggestedFilename()).toMatch(/scene-1-still/);
+    await page.locator('.stsv-dialog').screenshot({ path: '/opt/cursor/artifacts/screenshots/images-only-storyboard-1.png' });
+
+    await page.locator('#stsv-close').click();
+    const line = page.locator('#chat .mes', { hasText: 'Walk with me' }).first();
+    await line.locator('.stsv-pic-btn').click({ force: true });
+    await expect(page.locator('#stsv-status')).toContainText(/Stills are ready|cached/, { timeout: 90000 });
+    await expect(page.locator('.stsv-shot')).toHaveCount(1);
+    await expect(line.locator('.mes_img')).toBeVisible({ timeout: 20000 });
+    await page.locator('#stsv-close').click();
+    await line.screenshot({ path: '/opt/cursor/artifacts/screenshots/picture-this-moment-1.png' });
+
+    const ours = errors.filter((entry) => /stsv|scene-video|Scene Video/i.test(entry));
+    expect(ours, ours.join('\n')).toEqual([]);
+});
+
 async function dismissWelcome(page) {
     const heading = page.getByRole('heading', { name: 'Welcome to SillyTavern!' });
     const shown = await heading.waitFor({ state: 'visible', timeout: 15000 }).then(() => true).catch(() => false);

@@ -9,7 +9,8 @@
     color: var(--SmartThemeQuoteColor, #e0b15a);
 }
 
-.stsv-msg-btn {
+.stsv-msg-btn,
+.stsv-pic-btn {
     cursor: pointer;
     margin: 0 0.25em;
     opacity: 0.8;
@@ -17,6 +18,7 @@
 }
 
 .stsv-msg-btn:hover,
+.stsv-pic-btn:hover,
 .stsv-launch:hover {
     opacity: 1;
 }

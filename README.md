@@ -53,6 +53,8 @@ Local ComfyUI is the route with no host filter, and it is **$0** in the estimate
 
 If a step would pass the cap, generation stops and asks whether to continue. Cached stills and clips show **cached, $0** and are not billed again.
 
+**Images only**, next to Make my video, runs that same still path and stops. The estimate is the image price. Each still has **Download**. **Picture this moment** on a message makes one still of that line and posts it on the message when SillyTavern accepts the file.
+
 **Write shot list** and **Use local split** are still there when you want to tinker. Local split quotes the chat instead of condensing it.
 
 Closing the panel does not cancel a job. **Cancel** does. If stitching fails, the finished clips can still be downloaded one by one.
