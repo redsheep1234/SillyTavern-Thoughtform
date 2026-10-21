@@ -68,3 +68,18 @@ test('remix and a single still stay pending until approval', () => {
     assert.equal(mum.images.length, 1);
     assert.deepEqual(source, before);
 });
+
+test('deleting the parent leaves the related board editable', () => {
+    const library = parentLibrary();
+    const sister = createRelatedCharacter(library, library.records.source, { relation: 'sibling', name: 'Nia' });
+    delete library.records.source;
+    assert.doesNotThrow(() => applyTraitEdit(sister, undefined, { hair: 'black bob' }));
+    assert.match(sister.appearance, /black bob/);
+    assert.match(sister.appearance, /the source character/);
+    const draft = remixDraft(sister, undefined);
+    assert.match(draft.prompt, /Nia/);
+    assert.match(draft.prompt, /the original/);
+    assignRelation(sister, undefined, 'child');
+    assert.equal(sister.relation, 'child');
+    assert.equal(library.records.source, undefined);
+});

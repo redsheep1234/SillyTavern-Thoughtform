@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { estimateCost } from '../lib/cost.js';
+import { explainError } from '../lib/debug.js';
+import { comfyHardwareNote } from '../lib/providers/comfyui.js';
+import { imagesForPrompt } from '../lib/library.js';
 import { defaultSettings } from '../lib/constants.js';
 import { applySceneToWorkflow, detectMapping, parseWorkflowJson } from '../lib/comfy/workflow.js';
 import { buildFalBody } from '../lib/providers/fal.js';
@@ -59,6 +62,61 @@ test('xAI Lite 720p estimate is three cents a second', () => {
         sceneCount: 1,
     });
     assert.equal(unknown.known, false);
+    const withStill = estimateCost({
+        providerId: 'xai',
+        modelId: 'grok-imagine-video-1.5-lite',
+        resolution: '720p',
+        seconds: 5,
+        sceneCount: 1,
+        imageInputs: 1,
+    });
+    assert.equal(withStill.usd, 0.16);
+    const veo = estimateCost({
+        providerId: 'openrouter',
+        modelId: 'google/veo-3.1',
+        resolution: '1080p',
+        seconds: 5,
+        sceneCount: 1,
+    });
+    assert.equal(veo.usd, 1);
+    const veo4k = estimateCost({
+        providerId: 'openrouter',
+        modelId: 'google/veo-3.1',
+        resolution: '4k',
+        seconds: 1,
+        sceneCount: 1,
+    });
+    assert.equal(veo4k.usd, 0.4);
+    const veo720 = estimateCost({
+        providerId: 'openrouter',
+        modelId: 'google/veo-3.1',
+        resolution: '720p',
+        seconds: 5,
+        sceneCount: 1,
+    });
+    assert.equal(veo720.known, false);
+});
+
+test('timeouts and dropped connections are plain sentences', () => {
+    const timed = explainError('Timed out waiting for the video. You can try again.');
+    assert.match(timed.plain, /took too long/);
+    const dropped = explainError('Failed to fetch');
+    assert.match(dropped.plain, /connection dropped/);
+    const proxy = explainError('CORS proxy is disabled');
+    assert.match(proxy.plain, /CORS proxy is off/);
+});
+
+test('an 8GB ComfyUI card is pointed at LTX-2.3', () => {
+    const note = comfyHardwareNote({ devices: [{ name: 'cuda:0 RTX 3060 Ti', vram_total: 8 * 1024 ** 3 }] });
+    assert.match(note, /8\.0 GB/);
+    assert.match(note, /LTX-2\.3/);
+    assert.match(note, /14B does not fit/);
+    assert.match(comfyHardwareNote({}), /8GB/);
+});
+
+test('a missing board does not invent reference images', () => {
+    assert.deepEqual(imagesForPrompt(undefined), []);
+    assert.deepEqual(imagesForPrompt({ kind: 'character', images: [] }, { medium: 'anime' }), []);
 });
 
 test('xAI body clamps duration and keeps the image as a string', () => {

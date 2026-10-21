@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { imagesForPrompt } from '../lib/library.js';
 import { appearanceBlock } from '../lib/wardrobe.js';
-import { projectMedium, usableFeatureBrief, variantImageRequest } from '../lib/variants.js';
+import { projectMedium, styleMismatchNote, usableFeatureBrief, variantImageRequest } from '../lib/variants.js';
 
 test('a live-action variant is text only and photographic', () => {
     const request = variantImageRequest({
@@ -47,4 +47,14 @@ test('the project style picks its own reference set', () => {
 test('a shot-list reply is not used as the feature description', () => {
     assert.equal(usableFeatureBrief('{"scenes":[]}', 'silver bob'), 'silver bob');
     assert.equal(usableFeatureBrief('Amber eyes, silver bob, about 50.', ''), 'Amber eyes, silver bob, about 50.');
+});
+
+test('switching style mid-project warns until a matching avatar exists', () => {
+    const record = {
+        sourceMedium: 'anime',
+        images: [{ id: 'draw', dataUrl: 'data:image/png,a', medium: 'anime' }],
+    };
+    assert.match(styleMismatchNote(record, 'live-action'), /will not use the other set/);
+    assert.equal(styleMismatchNote(record, 'anime'), '');
+    assert.equal(styleMismatchNote({ images: [] }, 'live-action'), '');
 });

@@ -35,11 +35,11 @@
             <h4>ComfyUI</h4>
             <label>URL <input class="text_pole" data-setting="comfyUrl" type="text" autocomplete="off"></label>
             <div class="stsv-set-row">
-                <button type="button" class="menu_button" data-example="wan-t2v">Load Wan 2.2 example</button>
-                <button type="button" class="menu_button" data-example="ltx-23-t2v">Load LTX-2.3 example</button>
+                <button type="button" class="menu_button" data-example="ltx-23-t2v">Load LTX-2.3 (8GB)</button>
+                <button type="button" class="menu_button" data-example="wan-t2v">Load Wan 2.2 14B example</button>
                 <label class="menu_button">Import API JSON <input id="stsv-set-workflow-file" type="file" accept="application/json,.json" hidden></label>
             </div>
-            <p id="stsv-set-workflow-hint">No workflow loaded. Start ComfyUI with <code>--enable-cors-header *</code> on a machine you control. Do not publish that port.</p>
+            <p id="stsv-set-workflow-hint">No workflow loaded. On an 8GB RTX 3060 Ti, load LTX-2.3. Wan 2.2 14B does not fit that card. Start ComfyUI with <code>--enable-cors-header *</code> on a machine you control. Do not publish that port. Test ComfyUI is in the panel under Generate.</p>
             <label>API workflow JSON <textarea class="text_pole" data-setting="comfyWorkflow" rows="8"></textarea></label>
             <label>Node mapping override <textarea class="text_pole" data-setting="comfyMapping" rows="4" placeholder='{"prompt":{"node":"6","field":"text"}}'></textarea></label>
             <h4>Custom API</h4>

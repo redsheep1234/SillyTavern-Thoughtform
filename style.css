@@ -512,4 +512,17 @@ section[hidden] {
     .stsv-keyframe {
         grid-template-columns: 1fr;
     }
+
+    .stsv-budget label {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+
+    #stsv-make,
+    #stsv-generate,
+    .stsv-primary {
+        width: 100%;
+    }
 }

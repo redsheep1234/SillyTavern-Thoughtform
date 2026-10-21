@@ -10,8 +10,11 @@ import {
     fitPlan,
     formatClock,
     overCapMessage,
+    releaseMissingClips,
+    restoredShotNote,
     usdToAud,
 } from '../lib/simple.js';
+import { assessSpend } from '../lib/budget.js';
 
 test('AUD figures use the documented rough rate', () => {
     assert.equal(audToUsd(5), 3.3);
@@ -90,7 +93,7 @@ test('cached scenes are free and a higher look is a different clip', () => {
 test('short medium and full beat lists shrink a long chat', () => {
     const messages = Array.from({ length: 12 }, (_, index) => ({
         id: index,
-        name: index % 2 ? 'Aki' : 'Lumen',
+        name: index % 2 ? 'Aki' : 'Sera',
         text: `Line ${index}. The bridge is wet.`,
     }));
     const full = condenseBeats(messages, 'full');
@@ -118,4 +121,35 @@ test('showcase is the sharp preset and draft stays 480p', () => {
     assert.equal(settings.xaiModel, 'grok-imagine-video-1.5-lite');
     applyQualityPreset(settings, 'draft');
     assert.equal(settings.resolution, '480p');
+});
+
+test('a cap already partly spent blocks the next scene', () => {
+    const gate = assessSpend({ ledger: [{ usd: 3 }], cap: 3.3, estimateUsd: 0.5, known: true });
+    assert.equal(gate.blocked, true);
+    assert.ok(gate.projected > 3.3);
+    const message = overCapMessage({ projectedUsd: gate.projected, capAud: 5 });
+    assert.match(message, /Continue past the cap/);
+});
+
+test('a very long selection stays a short beat list', () => {
+    const messages = Array.from({ length: 200 }, (_, index) => ({
+        id: index,
+        name: index % 2 ? 'Aki' : 'Sera',
+        text: `Sentence ${index}. ${'word '.repeat(40)}`,
+    }));
+    assert.equal(condenseBeats([], 'short').length, 0);
+    const short = condenseBeats(messages, 'short');
+    assert.ok(short.length <= 4);
+    assert.ok(short.every((beat) => beat.text.length <= 500));
+});
+
+test('a clip hash without a blob is not treated as cached', () => {
+    const kept = releaseMissingClips([{ clipHash: 'abc', prompt: 'keep' }], { abc: {} });
+    assert.equal(kept.released, 0);
+    assert.equal(kept.scenes[0].clipHash, 'abc');
+    const dropped = releaseMissingClips([{ clipHash: 'gone', prompt: 'again' }], {});
+    assert.equal(dropped.released, 1);
+    assert.equal(dropped.scenes[0].clipHash, '');
+    assert.match(restoredShotNote(1, 1), /render again/);
+    assert.equal(restoredShotNote(0, 0), '');
 });

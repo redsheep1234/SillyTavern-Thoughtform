@@ -6,11 +6,42 @@ The film icon next to Send, the extensions menu item **Scene video**, the per-me
 
 ## Install
 
-1. In SillyTavern, open **Extensions** and choose **Install extension**.
-2. Paste the git URL of this project. The repository root already has `manifest.json`, `index.js`, `style.css`, and `settings.html`.
-3. Enable the extension and reload the chat.
+You need SillyTavern 1.13 or newer. 1.19 is what the automated test uses. There is no server plugin and nothing to copy by hand.
 
-Requires SillyTavern 1.13.0 or newer. The shot list can use the model you already connected in SillyTavern, so that step does not need a second key.
+1. In SillyTavern, open **Extensions** (the puzzle-piece menu) and choose **Install extension**.
+2. Paste the git URL of this project and install it. The repository root already has `manifest.json`, `index.js`, `style.css`, and `settings.html`, which is the layout SillyTavern expects.
+3. Enable **Scene Video** if it is not already on, then reload the page.
+4. Open any chat. The film icon next to Send opens the panel. The same panel is under the extensions menu as **Scene video**, and the slash command `/scenevideo`.
+
+You can try the whole path with no API key. The video provider and the stills provider both have a **Mock** choice. Mock draws a title card on this machine and the estimate stays **$0.00**.
+
+### Keys, when you want a hosted model
+
+Open **Extensions → Scene Video**.
+
+- **OpenRouter API key**: paste the key, then in the panel open **Generate** and click **Refresh OpenRouter models**. That replaces the fallback prices with the live list. The same key is used if you point the shot list at OpenRouter.
+- **fal.ai API key**: paste the key in the fal field. Test it with **Test fal.ai** under Generate.
+- **xAI API key**: the default hosted video route. Paste it the same way.
+- Leave the provider on **Mock** until a key is in place. A missing key stops with “add a key”, not a stack trace.
+
+Keys are stored in SillyTavern’s `settings.json` and in this browser. Treat them like passwords.
+
+### ComfyUI on an 8GB RTX 3060 Ti
+
+Local ComfyUI is the route with no host filter, and it is **$0** in the estimate.
+
+1. Start ComfyUI on that PC with `python main.py --enable-cors-header *`. Use that flag only on a machine you control. Do not put that port on the internet.
+2. In the panel, set the provider to **ComfyUI** and the URL to `http://127.0.0.1:8188` (the default).
+3. Click **Test ComfyUI**. A card with about 8GB of memory is told to load **LTX-2.3**, not Wan 2.2 14B. 14B does not fit. A Wan 2.2 5B GGUF you export yourself can run with offload, slowly.
+4. Click the **LTX-2.3 text-to-video (8GB)** example, then point the loader nodes at the model files you actually have (ComfyUI-GGUF, ComfyUI-LTXVideo, an LTX 2.3 GGUF, the LTX VAE, and a Gemma CLIP). The example is a skeleton. Checkpoint names inside it are placeholders.
+5. SillyTavern itself should be `http://127.0.0.1:8000`. An `https://` page cannot call `http://127.0.0.1:8188`.
+
+## Try it once
+
+1. Open a chat that has a few lines. Set **Mock** for the video provider and for stills if you do not have a key.
+2. Set a dollar cap in Australian dollars, or a target length. The footer shows a live estimate such as `≈ $2.27 AUD ($1.50 USD), 10 scenes, ~50s`. The US dollar figure uses about 0.66 USD per AUD and is labeled as a rough rate.
+3. Click **Make my video**. It uses that budget, Draft / Standard / Showcase, and moving stills. It stops so you can approve each keyframe.
+4. Approve the stills. Tick **Turn into video** on the scenes that should be real clips. The rest stay slow pans. **Download** is on the result step. One clip downloads on its own. Several clips are stitched in the browser the first time, which loads ffmpeg from jsDelivr.
 
 ## Make my video
 
@@ -53,7 +84,7 @@ Rates below were taken from provider pages around 21 October 2026. Confirm them 
 | fal Kling 2.5 Turbo Pro | $0.07/s after the $0.35 five-second base |
 | ComfyUI and the mock provider | $0 |
 
-OpenRouter's Veo sample SKU in the docs is about $0.50/s, and $0.75/s at 1080p. That number is a sample. The refresh button replaces it.
+OpenRouter’s Veo 3.1 route, video only, is about $0.20/s at 1080p and $0.40/s at 4K (about $0.40/s and $0.60/s with audio, which the estimate leaves out). 720p stays **Check provider** until you refresh. That is OpenRouter’s price, not the Gemini API. xAI adds about $0.01 when a still is sent with the clip. The scene quote includes that dollar; the per-second table above does not.
 
 ## Providers
 
@@ -91,8 +122,8 @@ Restart after changing it. The proxy is same-origin and forwards `Authorization`
 
 Shipped examples:
 
-- `workflows/wan-t2v.api.json` — Wan 2.2 14B text-to-video skeleton. Checkpoint names are placeholders. The two-stage high-noise / low-noise graph should be exported from your own install. Kijai's WanVideoWrapper uses different class names; the mapper follows field names and titles, but you should still check the mapping.
-- `workflows/ltx-2.3-t2v.api.json` — LTX-2.3 GGUF text-to-video. It expects ComfyUI-GGUF, ComfyUI-LTXVideo, `ltx-2.3-22b-dev-Q8_0.gguf`, the LTX 2.3 VAE, and a Gemma CLIP loaded as type `ltxv`. The example is 20 steps at CFG 3. A distilled LoRA path is often 8 steps at CFG 1; export that graph if that is what you run.
+- `workflows/ltx-2.3-t2v.api.json` — LTX-2.3 GGUF text-to-video. This is the example to load on an 8GB RTX 3060 Ti. It expects ComfyUI-GGUF, ComfyUI-LTXVideo, `ltx-2.3-22b-dev-Q8_0.gguf`, the LTX 2.3 VAE, and a Gemma CLIP loaded as type `ltxv`. The example is 20 steps at CFG 3. A distilled LoRA path is often 8 steps at CFG 1; export that graph if that is what you run.
+- `workflows/wan-t2v.api.json` — Wan 2.2 14B text-to-video skeleton. Too large for an 8GB card. Checkpoint names are placeholders. The two-stage high-noise / low-noise graph should be exported from your own install. Kijai's WanVideoWrapper uses different class names; the mapper follows field names and titles, but you should still check the mapping. On 8GB, a Wan 2.2 5B GGUF with offload is the Wan-shaped alternative, and you export that graph yourself.
 
 HunyuanVideo 1.5 is not shipped as a pretend graph. Export API format from your install. The mapper understands `EmptyHunyuanLatentVideo` width, height, and length.
 
@@ -166,7 +197,7 @@ Turn on **Debug mode** under Generate. The log shows each job's request summary,
 | Two people swapped clothes | Outfit names can match. The change follows the sentence that names that person. Approve a proposal before it is saved. |
 | "Add an xAI key" or 401 | Extensions → Scene Video. Keys live in SillyTavern's settings.json and in this browser. |
 | Replicate or another host fails immediately | Turn on `enableCorsProxy: true` or start with `--corsProxy`, then restart. fal, xAI, and OpenRouter do not need the proxy. |
-| ComfyUI does not answer | Start it with `--enable-cors-header *` on a machine you control. Do not publish that port. Load an API-format workflow, not the canvas file. |
+| ComfyUI does not answer | Start it with `--enable-cors-header *` on a machine you control. Do not publish that port. Click Test ComfyUI. On an 8GB card load LTX-2.3, not Wan 2.2 14B. Load an API-format workflow, not the canvas file. |
 | The stitch mentions SharedArrayBuffer | The extension loads single-thread ffmpeg from jsDelivr on the first multi-clip render. One clip skips ffmpeg. If the CDN is blocked, download the clips separately. |
 | Subtitles credit the wrong person | The line should read `Name: words`. Edit the dialogue box. The local split copies the chat speaker. |
 | The provider refused this prompt | Edit the wording, or the outfit description, and redo the still. Switching provider is the other option. Local ComfyUI does not use that host’s filter. |
@@ -175,7 +206,7 @@ Turn on **Debug mode** under Generate. The log shows each job's request summary,
 
 ## Example character
 
-`docs/examples/` has Lumen Quill, an original geometric character (sand face, teal braid, indigo coat, square lantern). It is not a real person. The stills are an expression sheet, a turnaround, and one extra outfit. `lumen-likeness.mp4` is a short mock clip that keeps that lantern, braid, and coat. No `OPENROUTER_API_KEY` or `FAL_KEY` was set for this repo, so the example was painted locally instead of billed to a provider. With a key, the same board is sent as reference images to a model that accepts them.
+`docs/fixtures/sera-voss/` is Sera Voss, the fixture character for demos and tests. She is not a real person: short silver bob, amber eyes, dark green raincoat, plus a coral sarong and an emerald dress. `docs/examples/sera-*.jpg` are the board crops. No `OPENROUTER_API_KEY` or `FAL_KEY` was set, so nothing was billed to a provider. With a key, the same board is sent as reference images to a model that accepts them.
 
 ## Develop
 
