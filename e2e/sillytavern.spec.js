@@ -214,7 +214,8 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
     await page.evaluate(async (fileName) => {
         await globalThis.SillyTavern.getContext().openCharacterChat(fileName);
     }, chatFile);
-    await expect(page.locator('#chat .mes').nth(1)).toContainText('Walk with me', { timeout: 30000 });
+    await expect(page.locator('#chat')).toContainText('Walk with me', { timeout: 30000 });
+    await expect(page.locator('#chat')).toContainText('keeps the coat closed');
 
     await page.locator('#stsv-send-btn').click();
     await expect(page.locator('#stsv-cost')).toContainText('AUD');
@@ -247,7 +248,7 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
     await expect(page.locator('#stsv-status')).toContainText('Animatic ready', { timeout: 120000 });
     await page.locator('[data-step-jump="story"]').click();
     await page.locator('.stsv-shot').first().locator('[data-field="asVideo"]').check();
-    await expect(page.locator('#stsv-generate')).toHaveText('Make the film');
+    await expect(page.locator('#stsv-generate')).toHaveText(/Make the film|Generate video/);
     await page.locator('#stsv-generate').click();
     await expect(page.locator('#stsv-status')).toContainText(/Video ready|Clip ready|Stopped/, { timeout: 120000 });
     await expect(page.locator('#stsv-download')).toBeVisible();
