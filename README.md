@@ -206,7 +206,7 @@ Turn on **Debug mode** under Generate. The log shows each job's request summary,
 
 ## Example character
 
-`docs/fixtures/sera-voss/` is Sera Voss, the fixture character for demos and tests. She is not a real person: short silver bob, amber eyes, dark green raincoat, plus a coral sarong and an emerald dress. `docs/examples/sera-*.jpg` are the board crops. No `OPENROUTER_API_KEY` or `FAL_KEY` was set, so nothing was billed to a provider. With a key, the same board is sent as reference images to a model that accepts them.
+`docs/fixtures/sera-voss/` is Sera Voss, the fixture character for demos and tests. She is not a real person: short silver bob, amber eyes, dark green raincoat, plus a coral sarong and an emerald dress. The folder holds the original sheets (`avatar.png`, `expressions.jpg`, `turnaround.jpg`, `outfit-coral-bikini.jpg`, `outfit-emerald-dress.jpg`). `docs/examples/sera-*.jpg` are the board crops from those sheets (`scripts/crop_sera.py`). No `OPENROUTER_API_KEY` or `FAL_KEY` was set, so nothing was billed to a provider. With a key, the same board is sent as reference images to a model that accepts them.
 
 ## Develop
 
