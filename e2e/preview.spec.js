@@ -33,9 +33,10 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.screenshot({ path: `${shots}/select-1.png` });
 
     await page.getByRole('button', { name: 'Cast and look' }).click();
-    await expect(page.locator('#stsv-board')).toContainText('Lumen Quill');
+    await expect(page.locator('#stsv-board')).toContainText('Sera Voss');
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
-    await expect(page.locator('#stsv-board')).toContainText('market uniform');
+    await expect(page.locator('#stsv-board')).toContainText('emerald dress');
+    await expect(page.locator('#stsv-board')).toContainText('coral sarong');
     await expect(page.locator('#stsv-board')).toContainText('Create related character');
     await page.getByRole('button', { name: 'Create related character' }).first().click();
     await expect(page.getByRole('button', { name: 'Remix' }).first()).toBeVisible();
@@ -73,6 +74,12 @@ test('group preview walks the panel without console errors', async ({ page }) =>
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('[data-step-jump="select"]').click();
+    await expect(page.locator('#stsv-cap-range')).toBeVisible();
+    const make = page.locator('#stsv-make');
+    await expect(make).toBeVisible();
+    const makeBox = await make.boundingBox();
+    expect(makeBox.y).toBeGreaterThanOrEqual(0);
+    expect(makeBox.y + makeBox.height).toBeLessThanOrEqual(860);
     await page.screenshot({ path: `${shots}/select-mobile-1.png` });
     await page.locator('[data-step-jump="cast"]').click();
     await page.screenshot({ path: `${shots}/cast-mobile-1.png` });
