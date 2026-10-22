@@ -84,7 +84,7 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     await expect(launcher).toBeVisible({ timeout: 30000 });
     await launcher.click();
     await expect(page.locator('#stsv-title')).toBeVisible();
-    await expect(page.locator('#stsv-cost')).toContainText('AUD');
+    await expect(page.locator('#stsv-cost')).toContainText(/A\$|AUD/);
     await expect(page.locator('#stsv-cap-aud')).toBeVisible();
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
@@ -158,6 +158,10 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     const dialog = page.locator('.stsv-dialog');
     const box = await dialog.boundingBox();
     expect(box?.height || 0).toBeGreaterThan(400);
+    const narrowBody = await page.locator('.stsv-body').boundingBox();
+    const narrowFooter = await page.locator('.stsv-footer').boundingBox();
+    expect(narrowFooter?.height || 0).toBeLessThan(80);
+    expect((narrowBody?.height || 0)).toBeGreaterThan((box?.height || 1) * 0.6);
     await page.screenshot({ path: 'test-results/screenshots/st-group-mobile-1.png' });
 
     const ours = errors.filter((line) => /stsv|scene-video|Scene Video|Thoughtform/i.test(line));
@@ -223,7 +227,7 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
     await page.locator('#stsv-send-btn').click();
     await page.locator('[data-bind="outputMode"]').selectOption('video');
     await expect(page.locator('#stsv-make')).toHaveText('Make my video');
-    await expect(page.locator('#stsv-cost')).toContainText('AUD');
+    await expect(page.locator('#stsv-cost')).toContainText(/A\$|AUD/);
     await page.locator('[data-bind="consistency"]').evaluate((el) => {
         el.value = 'keyframe';
         el.dispatchEvent(new Event('change', { bubbles: true }));
@@ -335,6 +339,7 @@ test('Images only stops after stills and Picture this moment posts one', async (
         el.value = 'mock';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });
+    await page.locator('.stsv-cost-details summary').click();
     await expect(page.locator('#stsv-cost-note')).toContainText('Images only');
     await page.locator('#stsv-make').click();
     await expect(page.locator('#stsv-status')).toContainText('Stills are ready', { timeout: 90000 });

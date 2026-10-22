@@ -4,12 +4,13 @@ import { readJobUpdate, pollJob, resumableJobs, upsertJob } from '../lib/queue.j
 import { buildDiagnostics, redactSettings } from '../lib/debug.js';
 import { ensureLibrary, syncLibrary } from '../lib/library.js';
 import { castForMessages, collectCast } from '../lib/messages.js';
-import { planReferenceSet } from '../lib/refset.js';
+import { expressionListText, parseExpressionList, planReferenceSet, turnaroundForPreset } from '../lib/refset.js';
 import { stillCost } from '../lib/providers/image.js';
 import { buildShotListRequest, linesFromDialogue, localShotList, parseShotList } from '../lib/shotlist.js';
 import { speakerCues } from '../lib/subtitles.js';
 import { dialogueLines, voiceFor } from '../lib/tts.js';
-import { acceptProposal, trackOutfits } from '../lib/wardrobe.js';
+import { acceptProposal, appearanceWithoutClothes, trackOutfits } from '../lib/wardrobe.js';
+import { spriteExportPlan, ST_EXPRESSIONS } from '../lib/sprites.js';
 import { defaultSettings } from '../lib/constants.js';
 
 const roster = [
@@ -163,8 +164,36 @@ test('the same outfit name stays on the character who changed', () => {
 test('reference set maps happy to joy and prices the mock at zero', () => {
     const plan = planReferenceSet({ includeExpressions: true, includeTurnaround: false, includeCloseups: false });
     assert.equal(plan.find((item) => item.label === 'happy').stLabel, 'joy');
+    assert.match(plan.find((item) => item.id === 'expr-happy').prompt, /3:4/);
+    assert.doesNotMatch(plan.find((item) => item.id === 'expr-happy').prompt, /sheet/i);
+    assert.equal(plan.find((item) => item.id === 'expr-happy').aspectRatio, '3:4');
     const cost = stillCost(plan.length, 'mock');
     assert.equal(cost.usd, 0);
+    const gemini = stillCost(12, 'google/gemini-2.5-flash-image');
+    assert.equal(gemini.quote, '12 images ≈ US$0.47 / A$0.71');
+    const quick = planReferenceSet({
+        expressions: parseExpressionList(expressionListText('quick')),
+        includeExpressions: true,
+        includeTurnaround: true,
+        turnaround: turnaroundForPreset('quick'),
+    });
+    assert.equal(quick.filter((item) => item.tags.includes('expression')).length, 4);
+    assert.equal(quick.find((item) => item.id === 'turn-front').aspectRatio, '16:9');
+    assert.match(quick.find((item) => item.id === 'turn-front').prompt, /single full-body figure/);
+    assert.equal(parseExpressionList('joy')[0].label, 'joy');
+    assert.equal(appearanceWithoutClothes('Short silver bob, amber eyes, dark green raincoat.'), 'Short silver bob, amber eyes');
+    const record = {
+        images: [
+            { dataUrl: 'data:image/png,a', tags: ['expression'], label: 'joy', stLabel: 'joy' },
+            { dataUrl: 'data:image/png,b', tags: ['expression'], label: 'sadness', stLabel: 'sadness' },
+            { dataUrl: 'data:image/png,c', tags: ['expression'], label: 'anger', stLabel: 'anger' },
+            { dataUrl: 'data:image/png,d', tags: ['expression'], label: 'neutral', stLabel: 'neutral' },
+            { dataUrl: 'data:image/png,e', tags: ['expression'], label: 'happy', stLabel: 'joy' },
+        ],
+    };
+    const exported = spriteExportPlan(record);
+    assert.equal(exported.mappings.find((item) => item.from === 'happy').to, 'joy');
+    assert.equal(exported.empty.length, ST_EXPRESSIONS.length - 4);
 });
 
 test('job resume reads a mocked provider payload and diagnostics hide keys', async () => {

@@ -24,7 +24,12 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.goto('http://127.0.0.1:43123/dev/preview.html');
     await expect(page.locator('#stsv-title')).toBeVisible();
     await expect(page.locator('#stsv-make')).toHaveText('Make my video');
-    await expect(page.locator('#stsv-cost')).toContainText('AUD');
+    await expect(page.locator('#stsv-cost')).toContainText(/A\$|AUD/);
+    const dialog = await page.locator('.stsv-dialog').boundingBox();
+    const body = await page.locator('.stsv-body').boundingBox();
+    const footer = await page.locator('.stsv-footer').boundingBox();
+    expect(footer.height).toBeLessThan(80);
+    expect(body.height).toBeGreaterThan(dialog.height * 0.6);
     await expect(page.getByRole('button', { name: 'Showcase' }).first()).toBeVisible();
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
@@ -33,8 +38,10 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.screenshot({ path: `${shots}/select-1.png` });
 
     await page.getByRole('button', { name: 'Cast and look' }).click();
-    await expect(page.locator('#stsv-board')).toContainText('Sera Voss');
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
+    await expect(page.locator('#stsv-expression-list')).toHaveValue(/joy/);
+    await page.locator('.stsv-more-boards > summary').click();
+    await expect(page.locator('#stsv-board')).toContainText('Sera Voss');
     await expect(page.locator('#stsv-board')).toContainText('emerald dress');
     await expect(page.locator('#stsv-board')).toContainText('coral sarong');
     await expect(page.locator('#stsv-board')).toContainText('Create related character');
@@ -73,6 +80,11 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.screenshot({ path: `${shots}/generate-1.png` });
 
     await page.setViewportSize({ width: 390, height: 844 });
+    const narrowDialog = await page.locator('.stsv-dialog').boundingBox();
+    const narrowBody = await page.locator('.stsv-body').boundingBox();
+    const narrowFooter = await page.locator('.stsv-footer').boundingBox();
+    expect(narrowFooter.height).toBeLessThan(80);
+    expect(narrowBody.height).toBeGreaterThan(narrowDialog.height * 0.6);
     await page.locator('[data-step-jump="select"]').click();
     await expect(page.locator('#stsv-cap-range')).toBeVisible();
     const make = page.locator('#stsv-make');

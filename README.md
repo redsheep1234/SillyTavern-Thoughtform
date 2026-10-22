@@ -47,6 +47,8 @@ Local ComfyUI is the route with no host filter, and it is **$0** in the estimate
 3. Click **Make my video**. It uses that budget, Draft / Standard / Showcase, and moving stills. It stops so you can approve each keyframe.
 4. Approve the stills. Tick **Turn into video** on the scenes that should be real clips. The rest stay slow pans. **Download** is on the result step. One clip downloads on its own. Several clips are stitched in the browser the first time, which loads ffmpeg from jsDelivr.
 
+**Where do my videos show up?** On the last message you selected, and on the Review step, where Download stays. While a job runs, Make my video and Generate stay disabled, the label reads Generating keyframe… then Generating video…, and the status line shows that stage plus the elapsed seconds. When it finishes, a Video ready notice appears. Click it to jump to that message. If generation fails, the error stays in the footer. The price stays one line, with the breakdown under Price details. Mock stills are text cards of the prompt. Pick an image model under Cast and look before a paid video.
+
 ## Make my video
 
 1. Open the panel. Set a dollar cap in Australian dollars, or a target length. The footer shows a live estimate such as `≈ $2.27 AUD ($1.50 USD), 10 scenes, ~50s` and updates as you change the cap, the look, or the provider. The US dollar figure uses about 0.66 USD per AUD, a rough rate, not a bank quote.
