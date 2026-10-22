@@ -117,8 +117,12 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(menuPop).toBeVisible();
     await more.click();
     await expect(menuPop).toBeHidden();
-    page.once('dialog', (dialog) => dialog.accept());
     await page.locator('.stsv-more-boards').getByRole('button', { name: 'Redo', exact: true }).first().click();
+    const confirmPop = page.locator('.stsv-confirm-pop');
+    await expect(confirmPop).toBeVisible();
+    await expect(confirmPop).toContainText(/Using \d+ references?:/);
+    await expect(confirmPop.locator('.stsv-confirm-refs img').first()).toBeVisible();
+    await confirmPop.getByRole('button', { name: 'Continue' }).click();
     await expect(page.locator('.stsv-redo')).toBeVisible();
     const preview = await page.locator('.stsv-more-boards .stsv-active img').first().boundingBox();
     expect(preview.width).toBeLessThan(200);

@@ -54,7 +54,8 @@ test('switching style mid-project warns until a matching avatar exists', () => {
         sourceMedium: 'anime',
         images: [{ id: 'draw', dataUrl: 'data:image/png,a', medium: 'anime' }],
     };
-    assert.match(styleMismatchNote(record, 'live-action'), /will not use the other set/);
+    assert.match(styleMismatchNote(record, 'live-action'), /looks anime but the style is Live action/);
+    assert.match(styleMismatchNote(record, 'live-action'), /Switch style to Anime/);
     assert.equal(styleMismatchNote(record, 'anime'), '');
     assert.equal(styleMismatchNote({ images: [] }, 'live-action'), '');
 });
