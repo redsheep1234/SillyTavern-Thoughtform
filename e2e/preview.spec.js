@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 
-const shots = '/opt/cursor/artifacts/screenshots';
+const shots = 'test-results/screenshots';
 
 test.beforeAll(() => {
     fs.mkdirSync(shots, { recursive: true });

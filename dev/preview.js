@@ -161,7 +161,7 @@ const nativeFetch = window.fetch.bind(window);
 window.fetch = async (url, options) => {
     const target = String(url);
     if (target.includes('/api/files/upload')) {
-        return new Response(JSON.stringify({ path: 'user/files/scene-video.mp4' }), {
+        return new Response(JSON.stringify({ path: 'user/files/thoughtform.mp4' }), {
             status: 200,
             headers: { 'content-type': 'application/json' },
         });

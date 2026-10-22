@@ -109,7 +109,7 @@
   "15": {
     "class_type": "SaveVideo",
     "inputs": {
-      "filename_prefix": "scene-video",
+      "filename_prefix": "thoughtform",
       "format": "mp4",
       "codec": "auto",
       "video": ["14", 0]

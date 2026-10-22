@@ -1,6 +1,9 @@
+import fs from 'node:fs';
 import { test, expect } from '@playwright/test';
 
 const base = process.env.ST_URL || 'http://127.0.0.1:8123';
+const shots = 'test-results/screenshots';
+fs.mkdirSync(shots, { recursive: true });
 
 test('SillyTavern 1.19 loads the extension and a three-member group', async ({ page }) => {
     const errors = [];
@@ -86,7 +89,7 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
     await expect(page.locator('#stsv-roster')).toContainText('Sable Orr');
-    await page.screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-select-1.png', fullPage: false });
+    await page.screenshot({ path: 'test-results/screenshots/st-group-select-1.png', fullPage: false });
 
     await page.locator('#stsv-all').click();
     await page.locator('#stsv-local').click();
@@ -101,10 +104,10 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     const sableAt = sable.indexOf('Sable Orr');
     const renAfterSable = sable.slice(sableAt).includes('Ren Moss');
     expect(renAfterSable).toBeFalsy();
-    await page.locator('#stsv-shots').screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-story-1.png' });
+    await page.locator('#stsv-shots').screenshot({ path: 'test-results/screenshots/st-group-story-1.png' });
     const lastShot = page.locator('#stsv-shots .stsv-shot').last();
     await lastShot.scrollIntoViewIfNeeded();
-    await page.locator('.stsv-dialog').screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-story-2.png' });
+    await page.locator('.stsv-dialog').screenshot({ path: 'test-results/screenshots/st-group-story-2.png' });
 
     await page.locator('[data-bind="consistency"]').evaluate((el) => {
         el.value = 'keyframe';
@@ -122,7 +125,7 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     await page.locator('#stsv-generate').click();
     await expect(page.locator('#stsv-status')).toContainText('Review the keyframes', { timeout: 90000 });
     await expect(page.locator('.stsv-keyframe-still').first()).toBeVisible();
-    await page.locator('.stsv-dialog').screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-keyframes-1.png' });
+    await page.locator('.stsv-dialog').screenshot({ path: 'test-results/screenshots/st-group-keyframes-1.png' });
     const shotCount = await page.locator('.stsv-shot').count();
     for (let index = 0; index < shotCount; index += 1) {
         await page.locator('.stsv-shot').nth(index).locator('[data-act="approve-keyframe"]').click();
@@ -141,8 +144,8 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
         page.waitForEvent('download'),
         page.locator('#stsv-download').click(),
     ]);
-    expect(download.suggestedFilename()).toMatch(/scene-video-/);
-    await page.screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-review-1.png' });
+    expect(download.suggestedFilename()).toMatch(/thoughtform-/);
+    await page.screenshot({ path: 'test-results/screenshots/st-group-review-1.png' });
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('[data-step-jump="select"]').evaluate((button) => button.click());
@@ -155,9 +158,9 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
     const dialog = page.locator('.stsv-dialog');
     const box = await dialog.boundingBox();
     expect(box?.height || 0).toBeGreaterThan(400);
-    await page.screenshot({ path: '/opt/cursor/artifacts/screenshots/st-group-mobile-1.png' });
+    await page.screenshot({ path: 'test-results/screenshots/st-group-mobile-1.png' });
 
-    const ours = errors.filter((line) => /stsv|scene-video|Scene Video/i.test(line));
+    const ours = errors.filter((line) => /stsv|scene-video|Scene Video|Thoughtform/i.test(line));
     expect(ours, ours.join('\n')).toEqual([]);
 });
 
@@ -258,10 +261,10 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
         page.waitForEvent('download'),
         page.locator('#stsv-download').click(),
     ]);
-    expect(download.suggestedFilename()).toMatch(/scene-video-/);
-    await page.screenshot({ path: '/opt/cursor/artifacts/screenshots/st-solo-review-1.png' });
+    expect(download.suggestedFilename()).toMatch(/thoughtform-/);
+    await page.screenshot({ path: 'test-results/screenshots/st-solo-review-1.png' });
 
-    const ours = errors.filter((line) => /stsv|scene-video|Scene Video/i.test(line));
+    const ours = errors.filter((line) => /stsv|scene-video|Scene Video|Thoughtform/i.test(line));
     expect(ours, ours.join('\n')).toEqual([]);
 });
 
@@ -341,7 +344,7 @@ test('Images only stops after stills and Picture this moment posts one', async (
         page.locator('.stsv-shot').first().locator('[data-act="download-still"]').click(),
     ]);
     expect(stillDownload.suggestedFilename()).toMatch(/scene-1-still/);
-    await page.locator('.stsv-dialog').screenshot({ path: '/opt/cursor/artifacts/screenshots/images-only-storyboard-1.png' });
+    await page.locator('.stsv-dialog').screenshot({ path: 'test-results/screenshots/images-only-storyboard-1.png' });
 
     await page.locator('#stsv-close').click();
     const line = page.locator('#chat .mes', { hasText: 'Walk with me' }).first();
@@ -350,14 +353,14 @@ test('Images only stops after stills and Picture this moment posts one', async (
     await expect(page.locator('.stsv-shot')).toHaveCount(1);
     await expect(line.locator('.mes_img')).toBeVisible({ timeout: 20000 });
     await page.locator('#stsv-close').click();
-    await line.screenshot({ path: '/opt/cursor/artifacts/screenshots/picture-this-moment-1.png' });
+    await line.screenshot({ path: 'test-results/screenshots/picture-this-moment-1.png' });
     await page.evaluate(() => {
         const context = globalThis.SillyTavern.getContext();
         if (context?.extensionSettings?.scene_video) context.extensionSettings.scene_video.outputMode = 'video';
         context?.saveSettingsDebounced?.();
     });
 
-    const ours = errors.filter((entry) => /stsv|scene-video|Scene Video/i.test(entry));
+    const ours = errors.filter((entry) => /stsv|scene-video|Scene Video|Thoughtform/i.test(entry));
     expect(ours, ours.join('\n')).toEqual([]);
 });
 

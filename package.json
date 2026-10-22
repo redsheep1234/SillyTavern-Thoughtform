@@ -1,8 +1,8 @@
 {
-  "name": "sillytavern-scene-video",
+  "name": "sillytavern-thoughtform",
   "private": true,
   "type": "module",
-  "description": "SillyTavern extension that turns selected chat messages into a scene video.",
+  "description": "Thoughtform, a SillyTavern extension that turns selected chat messages into a scene video.",
   "scripts": {
     "test": "node --test tests/*.mjs",
     "lint": "eslint .",

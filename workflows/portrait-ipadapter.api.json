@@ -79,7 +79,7 @@
   },
   "11": {
     "class_type": "SaveImage",
-    "inputs": { "filename_prefix": "scene-video-ref", "images": ["10", 0] },
+    "inputs": { "filename_prefix": "thoughtform-ref", "images": ["10", 0] },
     "_meta": { "title": "Save Image" }
   }
 }

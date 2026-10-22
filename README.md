@@ -1,23 +1,27 @@
-# Scene Video
+![Status: Work in progress / early alpha](https://img.shields.io/badge/Status-Work%20in%20progress%20%2F%20early%20alpha-orange)
+
+# Thoughtform
+
+**Status: Work in progress / early alpha.** This is an early proof of concept. Expect bugs and breaking changes. Feedback is welcome.
 
 SillyTavern extension that turns the messages you select in the current chat into a shot list, then a video. It installs from SillyTavern's **Install extension** box. There is no server plugin.
 
-The film icon next to Send, the extensions menu item **Scene video**, the per-message film icon, and `/scenevideo` all open the same panel.
+The film icon next to Send, the extensions menu item **Thoughtform**, the per-message film icon, and `/thoughtform` all open the same panel.
 
 ## Install
 
 You need SillyTavern 1.13 or newer. 1.19 is what the automated test uses. There is no server plugin and nothing to copy by hand.
 
 1. In SillyTavern, open **Extensions** (the puzzle-piece menu) and choose **Install extension**.
-2. Paste the git URL of this project and install it. The repository root already has `manifest.json`, `index.js`, `style.css`, and `settings.html`, which is the layout SillyTavern expects.
-3. Enable **Scene Video** if it is not already on, then reload the page.
-4. Open any chat. The film icon next to Send opens the panel. The same panel is under the extensions menu as **Scene video**, and the slash command `/scenevideo`.
+2. Paste `https://github.com/redsheep1234/SillyTavern-Thoughtform` and install. The repository root already has `manifest.json`, `index.js`, `style.css`, and `settings.html`, which is the layout SillyTavern expects.
+3. Enable **Thoughtform (WIP)** if it is not already on, then reload the page.
+4. Open any chat. The film icon next to Send opens the panel. The same panel is under the extensions menu as **Thoughtform**, and the slash command `/thoughtform`.
 
 You can try the whole path with no API key. The video provider and the stills provider both have a **Mock** choice. Mock draws a title card on this machine and the estimate stays **$0.00**.
 
 ### Keys, when you want a hosted model
 
-Open **Extensions → Scene Video**.
+Open **Extensions → Thoughtform**.
 
 - **OpenRouter API key**: paste the key, then in the panel open **Generate** and click **Refresh OpenRouter models**. That replaces the fallback prices with the live list. The same key is used if you point the shot list at OpenRouter.
 - **fal.ai API key**: paste the key in the fal field. Test it with **Test fal.ai** under Generate.
@@ -143,7 +147,7 @@ A JSON value that is exactly `{{duration}}` stays a number. Quotes in `{{prompt}
 
 - **SillyTavern** uses `generateRaw` with a JSON schema, then retries without the schema, then `generateQuietPrompt`.
 - **OpenRouter** uses the video key and a text model (`openrouter/auto` unless you change it).
-- **OpenAI-compatible** uses the base URL, key, and model under Extensions → Scene Video. A local server such as `http://127.0.0.1:5000/v1` works when it allows the browser or the proxy.
+- **OpenAI-compatible** uses the base URL, key, and model under Extensions → Thoughtform. A local server such as `http://127.0.0.1:5000/v1` works when it allows the browser or the proxy.
 
 The storyboard prompt tells the model the text is your fiction, including when it is mature, and to describe the picture without adding a warning or a refusal. This extension does not filter prompts or videos.
 
@@ -197,7 +201,7 @@ Turn on **Debug mode** under Generate. The log shows each job's request summary,
 | "Select at least one message." | Tick lines on Select, or use All. In a group, muted members with no selected lines are listed but not filmed. |
 | A face is missing from a shot | They joined later, or they are muted. Check the roster note and the "first speaks at" line in the shot-list prompt. |
 | Two people swapped clothes | Outfit names can match. The change follows the sentence that names that person. Approve a proposal before it is saved. |
-| "Add an xAI key" or 401 | Extensions → Scene Video. Keys live in SillyTavern's settings.json and in this browser. |
+| "Add an xAI key" or 401 | Extensions → Thoughtform. Keys live in SillyTavern's settings.json and in this browser. |
 | Replicate or another host fails immediately | Turn on `enableCorsProxy: true` or start with `--corsProxy`, then restart. fal, xAI, and OpenRouter do not need the proxy. |
 | ComfyUI does not answer | Start it with `--enable-cors-header *` on a machine you control. Do not publish that port. Click Test ComfyUI. On an 8GB card load LTX-2.3, not Wan 2.2 14B. Load an API-format workflow, not the canvas file. |
 | The stitch mentions SharedArrayBuffer | The extension loads single-thread ffmpeg from jsDelivr on the first multi-clip render. One clip skips ffmpeg. If the CDN is blocked, download the clips separately. |
