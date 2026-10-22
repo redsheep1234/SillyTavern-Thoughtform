@@ -47,7 +47,21 @@ Local ComfyUI is the route with no host filter, and it is **$0** in the estimate
 3. Click **Make my video**. It uses that budget, Draft / Standard / Showcase, and moving stills. It stops so you can approve each keyframe.
 4. Approve the stills. Tick **Turn into video** on the scenes that should be real clips. The rest stay slow pans. **Download** is on the result step. One clip downloads on its own. Several clips are stitched in the browser the first time, which loads ffmpeg from jsDelivr.
 
-**Where do my videos show up?** On the last message you selected, and on the Review step, where Download stays. While a job runs, Make my video and Generate stay disabled, the label reads Generating keyframe… then Generating video…, and the status line shows that stage plus the elapsed seconds. When it finishes, a Video ready notice appears. Click it to jump to that message. If generation fails, the error stays in the footer. The price stays one line, with the breakdown under Price details. Mock stills are text cards of the prompt. Pick an image model under Cast and look before a paid video.
+**Where do my videos show up?** On the message for that scene, and on the Review step, where Download stays. Generated stills and clips are saved with SillyTavern’s file upload and attached on the message (`extra.media`), so a reload can show them again. While a job runs, Make my video and Generate stay disabled, the label reads Generating keyframe… then Generating video…, and the status line shows that stage plus the elapsed seconds. When it finishes, a Video ready notice appears. Click it to jump to that message. If generation fails, the error stays in the footer. The price stays one line, with the breakdown under Price details. Mock stills are text cards of the prompt. Pick an image model under Cast and look before a paid video.
+
+## In this build
+
+These are early and still under the WIP badge. The settings key stays `scene_video`.
+
+- Generated stills and clips are uploaded and attached to the chat message, so they are still there after a reload.
+- A film cap, a this-visit cap, and a today cap. The estimate is shown before a paid still or clip, and a job that would pass a cap asks first.
+- A paid image or video call is not sent again on its own. Status checks only read a job that already started. Another try is a click.
+- Reference boards go out only for people named in that shot. Checkboxes on the shot can put a board back in.
+- **Animate this still** on a generated board image, a keyframe, or a picture already posted in chat. That picture is the keyframe.
+- Each character can list **Must keep** (silver bob, amber eyes) and **May change** (outfit, pose). Both lines go into still and video prompts.
+- Expression stills can upload into SillyTavern, or download as a zip of named files for the expressions folder.
+- The outfit tracked for the scene is written into still and video prompts, and the card’s old clothes are left out of that prompt.
+- Music is optional and off. Turn it on to play a file you added, or a tag on those files. Thoughtform does not generate music.
 
 ## Make my video
 
@@ -57,7 +71,7 @@ Local ComfyUI is the route with no host filter, and it is **$0** in the estimate
 4. A long selection can be **Short**, **Medium**, or **Full**. Edit the beats, then write the shots. Make my video uses the beats without an extra pause.
 5. Finer controls (resolution, frame rate, steps, model) sit under **Advanced**. Upgrading one scene’s look redoes only that scene.
 
-If a step would pass the cap, generation stops and asks whether to continue. Cached stills and clips show **cached, $0** and are not billed again.
+If a step would pass the film cap, this visit’s cap, or today’s cap, generation asks whether to continue. Cached stills and clips show **cached, $0** and are not billed again. A saved file from an earlier visit is not filmed again until you click Redo clip.
 
 **Images only**, next to Make my video, runs that same still path and stops. The estimate is the image price. Each still has **Download**. **Picture this moment** on a message makes one still of that line and posts it on the message when SillyTavern accepts the file.
 
