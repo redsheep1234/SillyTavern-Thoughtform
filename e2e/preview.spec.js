@@ -87,12 +87,15 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.getByRole('button', { name: 'Showcase' }).first()).toBeVisible();
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
+    await expect(page.locator('#stsv-roster').getByRole('button', { name: 'Board' }).first()).toBeVisible();
     await page.locator('#stsv-all').click();
     await page.locator('#stsv-local').click();
     await page.screenshot({ path: `${shots}/select-1.png` });
 
     await page.getByRole('button', { name: 'Cast and look' }).click();
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
+    await expect(page.locator('.stsv-guide')).toContainText('Add photos of a body type, an outfit, or a pose. Thoughtform uses each one only for what you tag it as.');
+    await expect(page.locator('.stsv-guide')).toContainText('of 28');
     await expect(page.locator('#stsv-expression-list')).toHaveValue(/joy/);
     await expect(page.locator('[data-preset="quick"]')).toHaveAttribute('aria-pressed', 'true');
     await page.locator('[data-preset="full"]').click();
@@ -126,7 +129,7 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.locator('.stsv-more-boards').getByRole('button', { name: 'Redo', exact: true }).first().click();
     const confirmPop = page.locator('.stsv-confirm-pop');
     await expect(confirmPop).toBeVisible();
-    await expect(confirmPop).toContainText(/Using \d+ references?:/);
+    await expect(confirmPop).toContainText(/Used:/);
     await expect(confirmPop.locator('.stsv-confirm-refs img').first()).toBeVisible();
     await confirmPop.getByRole('button', { name: 'Continue' }).click();
     await expect(page.locator('.stsv-redo')).toBeVisible();
@@ -158,7 +161,7 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.getByRole('button', { name: 'Generate avatar from text' }).click();
     await expect(page.locator('.stsv-studio img')).toBeVisible();
     await page.locator('.stsv-studio').screenshot({ path: `${shots}/variant-1.png` });
-    await page.getByRole('button', { name: 'Approve', exact: true }).click();
+    await page.locator('.stsv-studio').getByRole('button', { name: 'Approve', exact: true }).click();
     await expect(page.locator('#stsv-board')).toContainText('Live-action avatar');
     await page.locator('#stsv-board').scrollIntoViewIfNeeded();
     await page.locator('#stsv-board').screenshot({ path: `${shots}/cast-1.png` });

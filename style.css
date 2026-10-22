@@ -781,6 +781,7 @@ section[hidden] {
 .stsv-redo-pair img {
     display: block;
     width: 100%;
+    height: 96px;
     max-height: 96px;
     object-fit: cover;
 }
@@ -795,6 +796,65 @@ section[hidden] {
     flex-wrap: wrap;
     gap: 6px;
     margin: 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    padding: 6px 0;
+    background: var(--SmartThemeBlurTintColor, var(--SmartThemeChatTintColor, #1b1712));
+}
+
+.stsv-char-head {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.stsv-char-head figure {
+    margin: 0;
+}
+
+.stsv-char-head img,
+.stsv-char-head .stsv-ph {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.stsv-roles,
+.stsv-used-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.stsv-role {
+    padding: 2px 8px;
+    font-size: 0.82rem;
+}
+
+.stsv-used {
+    margin: 4px 0;
+    font-size: 0.85rem;
+}
+
+.stsv-used-thumb {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.stsv-inspire {
+    margin: 12px 0;
+}
+
+.stsv-check {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 0.85rem;
 }
 
 .stsv-look-row {
@@ -1066,6 +1126,10 @@ section[hidden] {
 
     .stsv-body .stsv-primary {
         width: 100%;
+    }
+
+    .stsv-char-head {
+        grid-template-columns: 1fr;
     }
 
     .stsv-look-row {
