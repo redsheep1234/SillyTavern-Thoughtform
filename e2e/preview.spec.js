@@ -94,11 +94,21 @@ test('group preview walks the panel without console errors', async ({ page }) =>
 
     await page.getByRole('button', { name: 'Cast and look' }).click();
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
+    await expect(page.locator('.stsv-guide [data-field="mustKeep"]')).toHaveValue(/teal braid/i);
+    await expect(page.locator('.stsv-guide [data-field="mayChange"]')).toHaveValue('outfit, pose');
+    await expect(page.locator('.stsv-guide').getByRole('button', { name: 'Describe from picture' })).toBeVisible();
+    await expect(page.locator('[data-target="stsv-jump-board"]')).toHaveText('All pictures');
+    await expect(page.locator('[data-target="stsv-jump-suite"]')).toHaveText('Build suite');
     await expect(page.locator('.stsv-guide')).toContainText('Add photos of a body type, an outfit, or a pose. Thoughtform uses each one only for what you tag it as.');
     await expect(page.locator('.stsv-guide')).toContainText('of 28');
     await expect(page.locator('#stsv-expression-list')).toHaveValue(/joy/);
     await expect(page.locator('[data-preset="quick"]')).toHaveAttribute('aria-pressed', 'true');
     await page.locator('[data-preset="full"]').click();
+    const extra = await page.locator('[data-extra="excitement"]').boundingBox();
+    expect(extra.width).toBeGreaterThan(8);
+    expect(extra.width).toBeLessThan(28);
+    expect(extra.height).toBeGreaterThan(8);
+    expect(extra.height).toBeLessThan(28);
     await expect(page.locator('#stsv-suite-quote')).toContainText('28 expressions, about');
     await expect(page.locator('#stsv-suite-quote')).toContainText('copies are free');
     await expect(page.locator('[data-extra="determined"]')).not.toBeChecked();
@@ -153,6 +163,15 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('[data-trait="hair"]').first()).toBeVisible();
     await expect(page.locator('#stsv-board')).toContainText('Generate a live-action avatar');
     await expect(page.locator('[data-step="cast"]')).toContainText('Style lock');
+    await page.locator('[data-step-jump="select"]').click();
+    await page.locator('#stsv-roster [data-act="open-board"][data-name="Aki Vale"]').click();
+    await expect(page.locator('#stsv-look-settings')).not.toHaveAttribute('open');
+    await expect.poll(async () => {
+        const head = await page.locator('#stsv-jump-look').boundingBox();
+        const scroller = await page.locator('.stsv-body').boundingBox();
+        return Math.abs(head.y - scroller.y);
+    }).toBeLessThan(30);
+    await expect(page.locator('#stsv-image-model')).toBeHidden();
     await page.getByRole('button', { name: 'Generate a live-action avatar' }).first().click();
     await expect(page.locator('#stsv-variant-text')).toBeVisible();
     const brief = await page.locator('#stsv-variant-text').inputValue();

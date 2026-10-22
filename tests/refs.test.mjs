@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { applyAvatarLook, parseAvatarLook } from '../lib/avatar-look.js';
+import { applyAvatarLook, parseAvatarLook, seedLookFields } from '../lib/avatar-look.js';
 import { characterAssetUrl, imagesForPrompt, materializeImage, referenceBlock, referencePlan, referenceSummary } from '../lib/library.js';
 import { planReferenceSet } from '../lib/refset.js';
 import { imagesInMedium } from '../lib/variants.js';
@@ -77,6 +77,26 @@ test('an avatar thumbnail is loaded from the full character path', async () => {
     assert.equal(init.credentials, 'same-origin');
     assert.equal(init.headers['X-CSRF-Token'], 'csrf-token');
     assert.equal(init.headers['Content-Type'], undefined);
+});
+
+test('empty Must keep and May change fill from the appearance', () => {
+    const record = {
+        appearance: 'Short silver bob, amber eyes, dark green raincoat. Fixture character, not a real person.',
+        mustKeep: '',
+        mayChange: '',
+    };
+    assert.equal(seedLookFields(record), true);
+    assert.match(record.mustKeep, /silver bob/i);
+    assert.match(record.mustKeep, /amber eyes/i);
+    assert.match(record.mustKeep, /green raincoat/i);
+    assert.equal(record.mayChange, 'outfit, pose');
+    record.mustKeep = '';
+    assert.equal(seedLookFields(record), false);
+    assert.equal(record.mustKeep, '');
+    const custom = { appearance: 'silver bob, amber eyes', mustKeep: 'amber eyes', mayChange: '' };
+    assert.equal(seedLookFields(custom), true);
+    assert.equal(custom.mustKeep, 'amber eyes');
+    assert.equal(custom.mayChange, 'outfit, pose');
 });
 
 test('a described avatar fills appearance, Must keep, and the suite prompt', () => {

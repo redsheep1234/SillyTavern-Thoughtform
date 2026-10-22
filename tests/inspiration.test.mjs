@@ -5,10 +5,12 @@ import { addImage, emptyRecord } from '../lib/library.js';
 import {
     INSPIRATION_HINT,
     boardCommandTarget,
+    imageRole,
     isIdentityPhoto,
     jobForTags,
     parseRoleSuggestion,
     selectJobReferences,
+    uploadRoleFromName,
 } from '../lib/inspiration.js';
 import { renderBoard } from '../lib/ui/board.js';
 
@@ -92,6 +94,47 @@ test('an identity inspiration face is used when the character has no avatar', ()
     assert.equal(picked.used, 'Used: Face photo');
 });
 
+test('an expression redo sends the main avatar before an untagged full-body upload', () => {
+    const sheet = {
+        id: 'sheet',
+        source: 'upload',
+        label: 'Upload',
+        tags: ['face'],
+        url: '/user/files/upload.png',
+        medium: 'live-action',
+    };
+    const record = {
+        name: 'Sera',
+        kind: 'character',
+        sourceMedium: 'anime',
+        primaryId: 'ava',
+        mustKeep: 'amber eyes',
+        images: [
+            { id: 'ava', source: 'avatar', tags: ['face'], url: '/characters/sera.png', label: 'Avatar' },
+            sheet,
+        ],
+    };
+    assert.equal(uploadRoleFromName('Upload'), '');
+    assert.equal(uploadRoleFromName('sera-turnaround-sheet.png'), 'body');
+    assert.equal(imageRole(sheet), 'body');
+    for (const job of ['expression', 'closeup']) {
+        const picked = selectJobReferences(record, { job, medium: 'live-action' });
+        assert.equal(picked.images[0]?.id, 'ava');
+        assert.equal(picked.images.some((image) => image.id === 'sheet'), false);
+        assert.match(picked.used, /^Used: avatar/);
+    }
+    const named = {
+        ...record,
+        images: [
+            record.images[0],
+            { ...sheet, id: 'turn', label: 'sera-turnaround.png', tags: ['face'] },
+        ],
+    };
+    const turn = selectJobReferences(named, { job: 'expression', medium: 'live-action' });
+    assert.equal(turn.images[0]?.id, 'ava');
+    assert.equal(turn.images.some((image) => image.id === 'turn'), false);
+});
+
 test('the avatar wins when an identity face photo is also on the board', () => {
     const record = cast();
     record.images.push(photo('me', 'face', { identity: true }));
@@ -171,6 +214,9 @@ test('the character page keeps one scroll and the inspiration hint', () => {
     assert.match(html, /No turnaround yet/);
     assert.match(html, /id="stsv-jump-look"/);
     assert.match(html, /id="stsv-jump-board"/);
+    assert.match(html, /data-target="stsv-jump-board">All pictures</);
+    assert.match(html, /data-target="stsv-jump-suite">Build suite</);
+    assert.match(html, /Describe from picture/);
     const look = html.indexOf('id="stsv-jump-look"');
     const board = html.indexOf('id="stsv-jump-board"');
     assert.ok(look >= 0 && look < board);
@@ -182,4 +228,9 @@ test('the character page keeps one scroll and the inspiration hint', () => {
     assert.match(boot, /name: 'board'/);
     assert.match(panel, /data-act="open-board"/);
     assert.match(panel, /cost\?\.used \|\| referenceSummary/);
+    assert.match(panel, /id="stsv-look-settings"/);
+    assert.match(panel, /collapseLook/);
+    const css = readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+    assert.match(css, /\.stsv-extras label \{[^}]*flex-direction:\s*row/);
+    assert.match(css, /input\[type="checkbox"\][^}]*appearance:\s*auto/);
 });

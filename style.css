@@ -328,6 +328,27 @@
     width: auto;
 }
 
+.stsv-dialog input[type="checkbox"],
+.stsv-dialog label input[type="checkbox"] {
+    width: 1rem !important;
+    height: 1rem !important;
+    min-width: 1rem !important;
+    max-width: 1rem !important;
+    flex: 0 0 1rem !important;
+    align-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    accent-color: var(--SmartThemeQuoteColor, #e0b15a);
+}
+
+.stsv-extras label {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px;
+}
+
 .stsv-dialog textarea {
     resize: vertical;
     min-height: 64px;
