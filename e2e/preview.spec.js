@@ -127,6 +127,11 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     const board = await page.locator('#stsv-jump-board').boundingBox();
     expect(look.y).toBeLessThan(board.y);
     await page.locator('.stsv-more-boards > summary').click();
+    const thumbMargin = await page.locator('.stsv-more-boards .stsv-thumb').first().evaluate((node) => {
+        const style = getComputedStyle(node);
+        return parseFloat(style.marginTop) + parseFloat(style.marginLeft);
+    });
+    expect(thumbMargin).toBe(0);
     await expect(page.locator('#stsv-board')).toContainText('Sera Voss');
     await expect(page.locator('.stsv-approved-badge').first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Main picture' }).first()).toBeVisible();
@@ -143,6 +148,15 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(confirmPop.locator('.stsv-confirm-refs img').first()).toBeVisible();
     await confirmPop.getByRole('button', { name: 'Continue' }).click();
     await expect(page.locator('.stsv-redo')).toBeVisible();
+    const freshStill = page.locator('.stsv-redo [data-still="new"]').first();
+    const currentStill = page.locator('.stsv-redo img[alt="Current still"]').first();
+    await expect(freshStill).toBeVisible();
+    const freshSrc = await freshStill.getAttribute('src');
+    const currentSrc = await currentStill.getAttribute('src');
+    expect(freshSrc).not.toBe(currentSrc);
+    expect(freshSrc.length).toBeGreaterThan(30);
+    const freshBox = await freshStill.boundingBox();
+    expect(freshBox.height).toBeLessThanOrEqual(97);
     const preview = await page.locator('.stsv-more-boards .stsv-active img').first().boundingBox();
     expect(preview.width).toBeLessThan(200);
     expect(preview.height).toBeLessThan(280);
@@ -166,6 +180,8 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await page.locator('[data-step-jump="select"]').click();
     await page.locator('#stsv-roster [data-act="open-board"][data-name="Aki Vale"]').click();
     await expect(page.locator('#stsv-look-settings')).not.toHaveAttribute('open');
+    await expect(page.locator('#stsv-char-look')).not.toHaveAttribute('open');
+    await expect(page.locator('#stsv-char-look textarea')).toBeHidden();
     await expect.poll(async () => {
         const head = await page.locator('#stsv-jump-look').boundingBox();
         const scroller = await page.locator('.stsv-body').boundingBox();
@@ -221,4 +237,44 @@ test('group preview walks the panel without console errors', async ({ page }) =>
 
     const unexpected = errors.filter((line) => !/favicon|Download the React DevTools/i.test(line));
     expect(unexpected, unexpected.join('\n')).toEqual([]);
+});
+
+test('expression and turnaround cards share the picture actions', async ({ page }) => {
+    await page.goto('http://127.0.0.1:43123/dev/preview.html');
+    await page.getByRole('button', { name: 'Cast and look' }).click();
+    await expect(page.locator('.stsv-guide').getByRole('button', { name: 'Describe from picture' })).toBeVisible();
+    await page.locator('#stsv-focus-board').selectOption({ label: 'Sera Voss' });
+    const expressions = page.locator('#stsv-jump-expressions');
+    await expect(expressions.getByRole('button', { name: 'Redo', exact: true }).first()).toBeVisible();
+    await expect(expressions.getByRole('button', { name: 'More', exact: true }).first()).toBeVisible();
+    await expect(expressions.getByRole('button', { name: 'Main picture' }).first()).toBeVisible();
+    const turn = page.locator('#stsv-jump-turn');
+    await expect(turn.getByRole('button', { name: 'Redo', exact: true }).first()).toBeVisible();
+    await expect(turn.getByRole('button', { name: 'More', exact: true }).first()).toBeVisible();
+    await expect(turn.getByRole('button', { name: 'Main picture' }).first()).toBeVisible();
+    const gap = await expressions.locator('.stsv-thumb').evaluateAll((nodes) => {
+        const first = nodes[0].getBoundingClientRect();
+        const style = getComputedStyle(nodes[0]);
+        const second = nodes[1].getBoundingClientRect();
+        const grid = nodes[0].parentElement.getBoundingClientRect();
+        return {
+            marginTop: parseFloat(style.marginTop),
+            marginLeft: parseFloat(style.marginLeft),
+            top: Math.round(first.top - grid.top),
+            left: Math.round(first.left - grid.left),
+            between: Math.round(second.left - first.right),
+            sameRow: Math.abs(first.top - second.top) < 2,
+        };
+    });
+    expect(gap.marginTop).toBe(0);
+    expect(gap.marginLeft).toBe(0);
+    expect(gap.top).toBeLessThan(4);
+    expect(gap.left).toBeLessThan(4);
+    expect(gap.sameRow).toBe(true);
+    expect(gap.between).toBeGreaterThan(8);
+    expect(gap.between).toBeLessThan(20);
+    await page.locator('[data-step-jump="select"]').click();
+    await page.locator('#stsv-roster [data-act="open-board"][data-name="Sera Voss"]').click();
+    await expect(page.locator('#stsv-char-look')).not.toHaveAttribute('open');
+    await expect(page.locator('#stsv-look-settings')).not.toHaveAttribute('open');
 });

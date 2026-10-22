@@ -4,7 +4,7 @@ import test from 'node:test';
 import { defaultSettings } from '../lib/constants.js';
 import { keyframeForVideo, planSceneImages } from '../lib/consistency.js';
 import { createJobLock, jobButtonLabel } from '../lib/job-lock.js';
-import { imageFromOpenRouter, isImageReference, generateReferenceImage, missingImageKey } from '../lib/providers/image.js';
+import { acceptNewStill, imageFromOpenRouter, isImageReference, generateReferenceImage, missingImageKey } from '../lib/providers/image.js';
 import { preferStillModel } from '../lib/settings.js';
 import { buildVideoCall } from '../lib/scene-request.js';
 
@@ -36,6 +36,28 @@ test('OpenRouter image parts and images payloads are kept', () => {
     assert.equal(imageFromOpenRouter({
         choices: [{ message: { content: `done ![still](${CARD})` } }],
     }), CARD);
+});
+
+test('a redo keeps the new still and drops an echoed reference', () => {
+    const avatar = 'data:image/png;base64,avatar';
+    const created = 'data:image/png;base64,sadness';
+    assert.equal(acceptNewStill(created, [avatar]), created);
+    assert.equal(acceptNewStill(avatar, [avatar]), '');
+    assert.equal(imageFromOpenRouter({
+        choices: [{ message: { images: [{ image_url: { url: avatar } }, { image_url: { url: created } }] } }],
+    }, [avatar]), created);
+    assert.equal(imageFromOpenRouter({
+        choices: [{ message: { images: [{ image_url: { url: avatar } }] } }],
+    }, [avatar]), '');
+    assert.equal(imageFromOpenRouter({
+        choices: [{ message: { images: [{ image_url: { url: created } }, { image_url: { url: avatar } }] } }],
+    }, [avatar]), created);
+    assert.equal(imageFromOpenRouter({
+        choices: [{ message: { images: [
+            { image_url: { url: 'data:image/png;base64,one' } },
+            { image_url: { url: 'data:image/png;base64,two' } },
+        ] } }],
+    }), 'data:image/png;base64,one');
 });
 
 test('a text-only OpenRouter still is one request and an error', async () => {

@@ -110,7 +110,30 @@ test('redo renders on the card with the charge and Use new', () => {
     assert.match(html, /Use new/);
     assert.match(html, /Keep current/);
     assert.match(html, /Charged A\$0\.06/);
-    assert.match(html, /alt="New still"/);
+    assert.match(html, /src="data:image\/png,new" alt="New still"/);
+    assert.doesNotMatch(html, /src="data:image\/png,old" alt="New still"/);
+    assert.doesNotMatch(html, /src="data:image\/png,avatar" alt="New still"/);
+    const expressions = html.slice(html.indexOf('id="stsv-jump-expressions"'), html.indexOf('id="stsv-jump-turn"'));
+    const turn = html.slice(html.indexOf('id="stsv-jump-turn"'), html.indexOf('id="stsv-jump-outfits"'));
+    assert.match(expressions, /data-act="redo-still"/);
+    assert.match(expressions, /aria-label="Main picture"/);
+    assert.match(expressions, />More</);
+    assert.match(turn, /No turnaround yet/);
+});
+
+test('redo compare hides a new still that matches the current picture', () => {
+    const html = renderBoard(model({
+        studio: {
+            stage: 'replace',
+            recordKey: 'c',
+            imageId: 'h',
+            busy: false,
+            previousDataUrl: 'data:image/png,old',
+            items: [{ label: 'happy', dataUrl: 'data:image/png,old', tags: ['expression'], prompt: 'portrait' }],
+        },
+    }));
+    assert.match(html, /alt="Current still"/);
+    assert.doesNotMatch(html, /alt="New still"/);
 });
 
 test('a busy redo shows on the card before the new still exists', () => {
