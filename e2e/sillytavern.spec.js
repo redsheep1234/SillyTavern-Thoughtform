@@ -113,7 +113,7 @@ test('SillyTavern 1.19 loads the extension and a three-member group', async ({ p
         el.value = 'keyframe';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    await page.locator('[data-bind="imageModel"]').evaluate((el) => {
+    await page.locator('[data-bind="imageModel"]').first().evaluate((el) => {
         el.value = 'mock';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });
@@ -232,7 +232,7 @@ test('SillyTavern 1.19 one-to-one Make my video exports a file', async ({ page }
         el.value = 'keyframe';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    await page.locator('[data-bind="imageModel"]').evaluate((el) => {
+    await page.locator('[data-bind="imageModel"]').first().evaluate((el) => {
         el.value = 'mock';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });
@@ -331,7 +331,7 @@ test('Images only stops after stills and Picture this moment posts one', async (
     await page.locator('#stsv-send-btn').click();
     await page.locator('[data-bind="outputMode"]').selectOption('images');
     await expect(page.locator('#stsv-make')).toHaveText('Make the pictures');
-    await page.locator('[data-bind="imageModel"]').evaluate((el) => {
+    await page.locator('[data-bind="imageModel"]').first().evaluate((el) => {
         el.value = 'mock';
         el.dispatchEvent(new Event('change', { bubbles: true }));
     });

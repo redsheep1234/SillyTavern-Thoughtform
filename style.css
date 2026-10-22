@@ -101,12 +101,17 @@
 }
 
 .stsv-note-bar {
+    display: flex;
     flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     padding: 0 12px;
 }
 
 .stsv-note-bar .stsv-status,
 .stsv-note-bar .stsv-error {
+    flex: 1 1 12rem;
     margin: 0;
     max-height: none;
     overflow: visible;
@@ -908,8 +913,36 @@ section[hidden] {
 
 .stsv-keyframe > .stsv-hint,
 .stsv-keyframe > label,
-.stsv-keyframe > .stsv-row {
+.stsv-keyframe > .stsv-row,
+.stsv-keyframe > .stsv-mock-card {
     grid-column: 1 / -1;
+}
+
+.stsv-mock-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.stsv-pictures,
+#stsv-image-model-label {
+    max-width: 22rem;
+}
+
+.stsv-image-key {
+    margin: 4px 0 8px;
+}
+
+.stsv-highlight {
+    outline: 2px solid var(--SmartThemeQuoteColor, #e0b15a);
+    outline-offset: 4px;
+    border-radius: 8px;
+    animation: stsv-pulse 0.9s ease 3;
+}
+
+@keyframes stsv-pulse {
+    50% { outline-color: transparent; }
 }
 
 .stsv-keyframe-prompt {

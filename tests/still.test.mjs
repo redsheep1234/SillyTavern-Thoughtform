@@ -4,7 +4,8 @@ import test from 'node:test';
 import { defaultSettings } from '../lib/constants.js';
 import { keyframeForVideo, planSceneImages } from '../lib/consistency.js';
 import { createJobLock, jobButtonLabel } from '../lib/job-lock.js';
-import { imageFromOpenRouter, isImageReference, generateReferenceImage } from '../lib/providers/image.js';
+import { imageFromOpenRouter, isImageReference, generateReferenceImage, missingImageKey } from '../lib/providers/image.js';
+import { preferStillModel } from '../lib/settings.js';
 import { buildVideoCall } from '../lib/scene-request.js';
 
 const CARD = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -146,4 +147,30 @@ test('panels scroll on their own and the price line stays compact', () => {
     assert.match(panel, /<summary title="Price details">Price<\/summary>/);
     assert.match(css, /\.stsv-footer-actions\s*\{[^}]*overflow:\s*hidden/);
     assert.match(panel, /Local split/);
+    assert.match(panel, /Pictures made with/);
+    assert.match(panel, /id="stsv-image-model"/);
+    assert.match(panel, /Choose a picture model/);
+    assert.match(panel, /data-act="choose-image-model"/);
+    assert.match(panel, /data-image-key/);
+    assert.match(panel, /mock text card/);
+});
+
+test('an OpenRouter key selects Gemini until a picture model is chosen', () => {
+    const fresh = { imageModel: 'mock', imageModelChosen: false, openrouterKey: 'sk-or' };
+    assert.equal(preferStillModel(fresh), true);
+    assert.equal(fresh.imageModel, 'google/gemini-2.5-flash-image');
+    const chosen = { imageModel: 'mock', imageModelChosen: true, openrouterKey: 'sk-or' };
+    assert.equal(preferStillModel(chosen), false);
+    assert.equal(chosen.imageModel, 'mock');
+    const bare = { imageModel: 'mock', imageModelChosen: false, openrouterKey: '' };
+    assert.equal(preferStillModel(bare), false);
+    assert.equal(bare.imageModel, 'mock');
+});
+
+test('a picture model says which key is missing', () => {
+    assert.match(missingImageKey({ imageModel: 'google/gemini-2.5-flash-image', openrouterKey: '' }).text, /OpenRouter key/);
+    assert.equal(missingImageKey({ imageModel: 'google/gemini-2.5-flash-image', openrouterKey: 'k' }), null);
+    assert.match(missingImageKey({ imageModel: 'fal-ai/flux-pro/kontext/multi', falKey: ' ' }).text, /fal\.ai key/);
+    assert.equal(missingImageKey({ imageModel: 'mock', openrouterKey: '' }), null);
+    assert.equal(missingImageKey({ imageModel: 'comfy' }), null);
 });
