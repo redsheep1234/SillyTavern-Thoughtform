@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { renderBoard } from '../lib/ui/board.js';
+import { redoConfirmLabel, renderBoard } from '../lib/ui/board.js';
 import { expressionCoverage } from '../lib/refset.js';
 import { replacementPrompt } from '../lib/relations.js';
 import { stillAssetKey } from '../lib/simple.js';
@@ -63,6 +63,27 @@ test('the board shows Quick, a main-picture star, and an Approved badge', () => 
     assert.match(html, /Export to SillyTavern expressions uploads into the character/);
     assert.match(html, />joy</);
     assert.match(html, /joy <span>done<\/span>/);
+    assert.match(html, /data-act="card-menu"/);
+    assert.doesNotMatch(html, /<details class="stsv-card-menu">/);
+});
+
+test('an old quick list opens on Quick with the full quick names', () => {
+    const html = renderBoard(model({ suitePreset: 'custom', expressionList: 'neutral\njoy\nsadness' }));
+    assert.match(html, /data-preset="quick"[^>]*aria-pressed="true"/);
+    assert.match(html, /data-preset="custom"[^>]*aria-pressed="false"/);
+    assert.match(html, /neutral\njoy\nsadness\nanger/);
+});
+
+test('aliases of the quick set stay on Quick', () => {
+    const html = renderBoard(model({ suitePreset: 'custom', expressionList: 'neutral\nhappy\nsad\nangry' }));
+    assert.match(html, /data-preset="quick"[^>]*aria-pressed="true"/);
+    assert.match(html, /joy/);
+    assert.doesNotMatch(html, /data-preset="custom"[^>]*aria-pressed="true"/);
+});
+
+test('a redo confirm uses the name on the card', () => {
+    assert.equal(redoConfirmLabel({ label: 'happy', stLabel: 'joy', tags: ['expression'] }), 'joy');
+    assert.equal(redoConfirmLabel({ label: 'happy', tags: ['expression'] }), 'joy');
 });
 
 test('a custom expression list selects Custom', () => {
@@ -141,8 +162,11 @@ test('an expression redo asks for a portrait and a different seed changes the ca
     assert.equal(stillAssetKey(base), stillAssetKey({ ...base, seed: '' }));
 });
 
-test('the mock clip stays a title card', () => {
+test('the mock clip stays a title card and the free path is a moving still', () => {
     const mock = readFileSync(new URL('../lib/providers/mock.js', import.meta.url), 'utf8');
+    const registry = readFileSync(new URL('../lib/providers/registry.js', import.meta.url), 'utf8');
     assert.doesNotMatch(mock, /drawImage/);
     assert.match(mock, /Thoughtform mock/);
+    assert.match(registry, /moving still/);
+    assert.match(registry, /title card/);
 });

@@ -36,6 +36,35 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     const footer = await page.locator('.stsv-footer').boundingBox();
     expect(footer.height).toBeLessThan(80);
     expect(body.height).toBeGreaterThan(dialog.height * 0.6);
+    await page.locator('.stsv-dialog').evaluate((node) => { node.style.width = '480px'; });
+    await page.locator('#stsv-status').evaluate((node) => {
+        node.textContent = 'Your clip is in Review — attach it to the chat';
+        node.title = node.textContent;
+    });
+    const narrow = page.locator('.stsv-footer');
+    const fits = await narrow.evaluate((node) => ({
+        overflow: node.scrollWidth - node.clientWidth,
+        actions: node.querySelector('.stsv-footer-actions').scrollWidth - node.querySelector('.stsv-footer-actions').clientWidth,
+    }));
+    expect(fits.overflow).toBeLessThanOrEqual(1);
+    expect(fits.actions).toBeLessThanOrEqual(1);
+    const statusBox = await page.locator('#stsv-status').boundingBox();
+    expect(statusBox.width).toBeGreaterThan(200);
+    const statusText = await page.locator('#stsv-status').evaluate((node) => ({
+        full: node.scrollWidth <= node.clientWidth + 1 && node.scrollHeight <= node.clientHeight + 1,
+        text: node.textContent,
+    }));
+    expect(statusText.text).toBe('Your clip is in Review — attach it to the chat');
+    expect(statusText.full).toBe(true);
+    await expect(page.locator('.stsv-footer #stsv-status')).toHaveCount(0);
+    await expect(page.locator('.stsv-cost-details summary')).toHaveText('Price');
+    const makeNarrow = await page.locator('#stsv-make').boundingBox();
+    const cancelNarrow = await page.locator('#stsv-cancel').boundingBox();
+    const footerNarrow = await narrow.boundingBox();
+    expect(makeNarrow.x).toBeGreaterThanOrEqual(footerNarrow.x);
+    expect(makeNarrow.x + makeNarrow.width).toBeLessThanOrEqual(footerNarrow.x + footerNarrow.width + 1);
+    expect(cancelNarrow.x + cancelNarrow.width).toBeLessThanOrEqual(footerNarrow.x + footerNarrow.width + 1);
+    await page.locator('.stsv-dialog').evaluate((node) => { node.style.width = ''; });
     await expect(page.getByRole('button', { name: 'Showcase' }).first()).toBeVisible();
     await expect(page.locator('#stsv-roster')).toContainText('Ren Moss');
     await expect(page.locator('#stsv-roster')).toContainText('Muted');
@@ -63,11 +92,26 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-board')).toContainText('Sera Voss');
     await expect(page.locator('.stsv-approved-badge').first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Main picture' }).first()).toBeVisible();
+    const more = page.locator('.stsv-more-boards').getByRole('button', { name: 'More', exact: true }).first();
+    const menuPop = more.locator('xpath=..').locator('.stsv-card-menu-pop');
+    await more.click();
+    await expect(menuPop).toBeVisible();
+    await more.click();
+    await expect(menuPop).toBeHidden();
     page.once('dialog', (dialog) => dialog.accept());
     await page.locator('.stsv-more-boards').getByRole('button', { name: 'Redo', exact: true }).first().click();
     await expect(page.locator('.stsv-redo')).toBeVisible();
+    const preview = await page.locator('.stsv-more-boards .stsv-active img').first().boundingBox();
+    expect(preview.width).toBeLessThan(200);
+    expect(preview.height).toBeLessThan(280);
+    const beforeScroll = await page.locator('.stsv-body').evaluate((node) => node.scrollTop);
     await expect(page.getByRole('button', { name: 'Use new' })).toBeVisible();
     await expect(page.locator('.stsv-charge')).toContainText('Charged');
+    await page.getByRole('button', { name: 'Use new' }).click();
+    await expect(page.locator('.stsv-redo')).toHaveCount(0);
+    const afterScroll = await page.locator('.stsv-body').evaluate((node) => node.scrollTop);
+    expect(Math.abs(afterScroll - beforeScroll)).toBeLessThan(80);
+    await expect(page.locator('#stsv-status')).toContainText('Approved. This view uses the new still.');
     await expect(page.locator('#stsv-board')).toContainText('emerald dress');
     await expect(page.locator('#stsv-board')).toContainText('coral sarong');
     await expect(page.locator('#stsv-board')).toContainText('Create related character');

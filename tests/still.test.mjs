@@ -140,4 +140,10 @@ test('panels scroll on their own and the price line stays compact', () => {
     assert.match(panel, /Your clip is in Review — attach it to the chat/);
     assert.match(panel, /id="stsv-cancel"/);
     assert.match(css, /\.stsv-footer-actions/);
+    const footerAt = panel.indexOf('<footer class="stsv-footer">');
+    assert.ok(panel.indexOf('id="stsv-status"') < footerAt);
+    assert.ok(panel.indexOf('id="stsv-local"') < footerAt);
+    assert.match(panel, /<summary title="Price details">Price<\/summary>/);
+    assert.match(css, /\.stsv-footer-actions\s*\{[^}]*overflow:\s*hidden/);
+    assert.match(panel, /Local split/);
 });
