@@ -9,7 +9,8 @@ import { stillCost } from '../lib/providers/image.js';
 import { buildShotListRequest, linesFromDialogue, localShotList, parseShotList } from '../lib/shotlist.js';
 import { speakerCues } from '../lib/subtitles.js';
 import { dialogueLines, voiceFor } from '../lib/tts.js';
-import { acceptProposal, appearanceWithoutClothes, trackOutfits } from '../lib/wardrobe.js';
+import { traitLine } from '../lib/keyframes.js';
+import { acceptProposal, appearanceBlock, appearanceWithoutClothes, trackOutfits } from '../lib/wardrobe.js';
 import { spriteExportPlan, ST_EXPRESSIONS } from '../lib/sprites.js';
 import { defaultSettings } from '../lib/constants.js';
 
@@ -182,6 +183,23 @@ test('reference set maps happy to joy and prices the mock at zero', () => {
     assert.match(quick.find((item) => item.id === 'turn-front').prompt, /single full-body figure/);
     assert.equal(parseExpressionList('joy')[0].label, 'joy');
     assert.equal(appearanceWithoutClothes('Short silver bob, amber eyes, dark green raincoat.'), 'Short silver bob, amber eyes');
+    const worn = traitLine({
+        appearance: 'Short silver bob, amber eyes, dark green raincoat.',
+        mustKeep: 'silver bob, amber eyes',
+    }, { id: 'dress', name: 'Emerald dress', description: 'a floor-length emerald dress' }, null);
+    assert.match(worn, /emerald dress/i);
+    assert.match(worn, /silver bob/);
+    assert.doesNotMatch(worn, /raincoat/);
+    const block = appearanceBlock({
+        cast: [{ key: 's', name: 'Sera', outfitId: 'dress' }],
+    }, [{
+        key: 's',
+        name: 'Sera',
+        appearance: 'Short silver bob, amber eyes, dark green raincoat.',
+        outfits: [{ id: 'dress', name: 'Emerald dress', description: 'a floor-length emerald dress' }],
+    }]);
+    assert.match(block, /emerald dress/i);
+    assert.doesNotMatch(block, /raincoat/);
     const record = {
         images: [
             { dataUrl: 'data:image/png,a', tags: ['expression'], label: 'joy', stLabel: 'joy' },
