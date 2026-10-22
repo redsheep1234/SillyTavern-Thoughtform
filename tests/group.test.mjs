@@ -211,7 +211,10 @@ test('reference set maps happy to joy and prices the mock at zero', () => {
     };
     const exported = spriteExportPlan(record);
     assert.equal(exported.mappings.find((item) => item.from === 'happy').to, 'joy');
-    assert.equal(exported.empty.length, ST_EXPRESSIONS.length - 4);
+    assert.equal(exported.empty.includes('approval'), false);
+    assert.equal(exported.empty.includes('love'), true);
+    assert.equal(exported.targets.some((item) => item.stLabel === 'approval' && item.copyOf === 'joy'), true);
+    assert.equal(exported.empty.length, ST_EXPRESSIONS.length - 11);
 });
 
 test('job resume reads a mocked provider payload and diagnostics hide keys', async () => {

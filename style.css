@@ -385,6 +385,17 @@
     margin: 10px 0;
 }
 
+.stsv-extras {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0;
+}
+
+.stsv-copy {
+    color: var(--SmartThemeQuoteColor, #e0b15a);
+}
+
 .stsv-budget,
 .stsv-related,
 .stsv-advanced,

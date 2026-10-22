@@ -95,6 +95,12 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
     await expect(page.locator('#stsv-expression-list')).toHaveValue(/joy/);
     await expect(page.locator('[data-preset="quick"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('[data-preset="full"]').click();
+    await expect(page.locator('#stsv-suite-quote')).toContainText('28 expressions, about');
+    await expect(page.locator('#stsv-suite-quote')).toContainText('copies are free');
+    await expect(page.locator('[data-extra="determined"]')).not.toBeChecked();
+    await page.locator('[data-preset="quick"]').click();
+    await expect(page.locator('[data-preset="quick"]')).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('[data-preset="quick"]')).toHaveClass(/stsv-on/);
     const stepsBefore = await page.locator('.stsv-steps').boundingBox();
     const title = await page.locator('#stsv-title').boundingBox();
