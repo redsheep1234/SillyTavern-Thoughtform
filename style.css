@@ -729,6 +729,13 @@ section[hidden] {
     }
 }
 
+.stsv-animate {
+    display: inline-block;
+    margin: 0.25rem 0;
+    font: inherit;
+    font-size: 0.75rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .stsv-busy::before {
         animation: none;
