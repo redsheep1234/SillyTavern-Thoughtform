@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { explainError } from '../lib/debug.js';
-import { composeKeyframePrompt, keyframesPending, planKeyframeJob, placementFor } from '../lib/keyframes.js';
+import { composeKeyframePrompt, keyframesPending, planKeyframeJob, placementFor, traitLine } from '../lib/keyframes.js';
+import { appearanceBlock } from '../lib/wardrobe.js';
 import { createRelatedCharacter, familyReferences } from '../lib/relations.js';
 import { buildShotListRequest, composeVideoPrompt } from '../lib/shotlist.js';
 import { styleLockText } from '../lib/style-lock.js';
@@ -42,6 +43,21 @@ test('a group keyframe places people and keeps their traits', () => {
     assert.match(prompt, /Adjustment: visibly older, 50s/);
     assert.match(prompt, /Do not swap their face/);
     assert.equal(placementFor(1, 3), 'in the center');
+    const guarded = traitLine({
+        appearance: 'short silver bob, amber eyes',
+        mustKeep: 'silver bob, amber eyes',
+        mayChange: 'outfit, pose',
+    }, null, null);
+    assert.match(guarded, /Must keep: silver bob, amber eyes/);
+    assert.match(guarded, /May change: outfit, pose/);
+    assert.match(composeKeyframePrompt({
+        scene: { prompt: 'She looks up.', cast: [{ key: 'a', name: 'Sera' }] },
+        settings: { style: 'live-action', themeId: 'neutral' },
+        records: [{ key: 'a', name: 'Sera', appearance: 'short silver bob, amber eyes', mustKeep: 'silver bob, amber eyes', mayChange: 'outfit, pose' }],
+    }), /Must keep: silver bob, amber eyes/);
+    assert.match(appearanceBlock({
+        cast: [{ key: 'a', name: 'Sera' }],
+    }, [{ key: 'a', name: 'Sera', appearance: 'short silver bob, amber eyes', mustKeep: 'silver bob, amber eyes', mayChange: 'outfit, pose' }]), /May change: outfit, pose/);
 });
 
 test('group keyframes draw each person before the shared still', () => {
