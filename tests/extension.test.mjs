@@ -16,7 +16,7 @@ import { applyQualityPreset, getQualityPreset } from '../lib/presets.js';
 import { ensureSettings } from '../lib/settings.js';
 import { buildShotListRequest, localShotList, parseShotList } from '../lib/shotlist.js';
 import { buildXfadeFilter, clipSeconds, safeFade } from '../lib/stitch.js';
-import { toProxyUrl } from '../lib/transport.js';
+import { toProxyUrl, transportAttempts } from '../lib/transport.js';
 import { frameCount, getByPath, safeFileName } from '../lib/util.js';
 
 test('index loads without SillyTavern', async () => {
@@ -223,6 +223,17 @@ test('custom template keeps quotes and numeric duration', () => {
 test('proxy URL stays a raw http target', () => {
     assert.equal(toProxyUrl('https://api.replicate.com/v1/predictions'), '/proxy/https://api.replicate.com/v1/predictions');
     assert.throws(() => toProxyUrl('javascript:alert(1)'));
+});
+
+test('a paid write is sent once and a status read may use the proxy', () => {
+    assert.deepEqual(transportAttempts('POST', 'auto'), ['direct']);
+    assert.deepEqual(transportAttempts('POST', 'proxy'), ['proxy']);
+    assert.deepEqual(transportAttempts('GET', 'auto'), ['direct', 'proxy']);
+    const llm = readFileSync(new URL('../lib/llm.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(llm, /generateRaw\(\{ prompt: requestText/);
+    assert.doesNotMatch(llm, /response_format/);
+    const image = readFileSync(new URL('../lib/providers/image.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(image, /retry/i);
 });
 
 test('shot list parses fenced JSON and the local split quotes the chat', () => {
