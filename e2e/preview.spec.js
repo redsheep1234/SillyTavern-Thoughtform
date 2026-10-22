@@ -29,6 +29,8 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('.stsv-step[data-step="select"] [data-image-key]')).toContainText('OpenRouter key');
     await page.locator('.stsv-step[data-step="select"] [data-act="open-image-key"]').click();
     await expect(page.locator('#stsv-settings [data-setting="openrouterKey"]')).toBeFocused();
+    await page.locator('#stsv-settings [data-test-key="openrouter"]').evaluate((node) => node.click());
+    await expect(page.locator('#stsv-settings [data-test-result="openrouter"]')).toContainText('No OpenRouter key yet');
     await page.locator('#stsv-send-btn').click();
     await expect(page.locator('#stsv-title')).toBeVisible();
     await page.locator('#stsv-pictures').selectOption('mock');

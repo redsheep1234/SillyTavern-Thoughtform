@@ -552,6 +552,28 @@ section[hidden] {
     gap: 8px;
 }
 
+#stsv-settings .stsv-key-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 8px;
+    align-items: end;
+}
+
+#stsv-settings .stsv-key-field label {
+    margin: 0;
+    min-width: 0;
+}
+
+#stsv-settings .stsv-key-field .menu_button {
+    margin: 0;
+}
+
+#stsv-settings .stsv-key-result {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
 #stsv-cost {
     margin: 0;
     font-size: 0.95rem;

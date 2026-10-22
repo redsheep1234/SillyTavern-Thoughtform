@@ -14,15 +14,35 @@
                     <option value="openai">OpenAI-compatible endpoint</option>
                 </select>
             </label>
-            <label>OpenRouter API key <input class="text_pole" data-setting="openrouterKey" type="password" autocomplete="off"></label>
+            <div class="stsv-key-field">
+                <label>OpenRouter API key <input class="text_pole" data-setting="openrouterKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="openrouter">Test key</button>
+                <p class="stsv-key-result" data-test-result="openrouter" hidden></p>
+            </div>
             <label>OpenRouter text model <input class="text_pole" data-setting="openrouterTextModel" type="text" autocomplete="off"></label>
             <label>OpenAI-compatible base URL <input class="text_pole" data-setting="openaiBaseUrl" type="text" autocomplete="off"></label>
-            <label>OpenAI-compatible key <input class="text_pole" data-setting="openaiKey" type="password" autocomplete="off"></label>
+            <div class="stsv-key-field">
+                <label>OpenAI-compatible key <input class="text_pole" data-setting="openaiKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="openai">Test key</button>
+                <p class="stsv-key-result" data-test-result="openai" hidden></p>
+            </div>
             <label>OpenAI-compatible model <input class="text_pole" data-setting="openaiModel" type="text" autocomplete="off"></label>
             <h4>Video keys</h4>
-            <label>xAI API key <input class="text_pole" data-setting="xaiKey" type="password" autocomplete="off"></label>
-            <label>fal.ai API key <input class="text_pole" data-setting="falKey" type="password" autocomplete="off"></label>
-            <label>Replicate API token <input class="text_pole" data-setting="replicateKey" type="password" autocomplete="off"></label>
+            <div class="stsv-key-field">
+                <label>xAI API key <input class="text_pole" data-setting="xaiKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="xai">Test key</button>
+                <p class="stsv-key-result" data-test-result="xai" hidden></p>
+            </div>
+            <div class="stsv-key-field">
+                <label>fal.ai API key <input class="text_pole" data-setting="falKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="fal">Test key</button>
+                <p class="stsv-key-result" data-test-result="fal" hidden></p>
+            </div>
+            <div class="stsv-key-field">
+                <label>Replicate API token <input class="text_pole" data-setting="replicateKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="replicate">Test key</button>
+                <p class="stsv-key-result" data-test-result="replicate" hidden></p>
+            </div>
             <p>Replicate needs SillyTavern's CORS proxy (<code>enableCorsProxy: true</code> or <code>--corsProxy</code>). fal, xAI, and OpenRouter are called from the browser. OpenAI Sora 2 and the Gemini API Veo preview are not built in.</p>
             <label>Browser calls
                 <select class="text_pole" data-setting="corsMode">
@@ -43,7 +63,11 @@
             <label>API workflow JSON <textarea class="text_pole" data-setting="comfyWorkflow" rows="8"></textarea></label>
             <label>Node mapping override <textarea class="text_pole" data-setting="comfyMapping" rows="4" placeholder='{"prompt":{"node":"6","field":"text"}}'></textarea></label>
             <h4>Custom API</h4>
-            <label>API key <input class="text_pole" data-setting="custom.apiKey" type="password" autocomplete="off"></label>
+            <div class="stsv-key-field">
+                <label>API key <input class="text_pole" data-setting="custom.apiKey" type="password" autocomplete="off"></label>
+                <button type="button" class="menu_button" data-test-key="custom">Test key</button>
+                <p class="stsv-key-result" data-test-result="custom" hidden></p>
+            </div>
             <label>Submit URL <input class="text_pole" data-setting="custom.submitUrl" type="text" autocomplete="off"></label>
             <label>Poll URL <input class="text_pole" data-setting="custom.pollUrl" type="text" placeholder="https://host/jobs/{{id}}" autocomplete="off"></label>
             <label>Cancel URL <input class="text_pole" data-setting="custom.cancelUrl" type="text" autocomplete="off"></label>
