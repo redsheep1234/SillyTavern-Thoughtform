@@ -99,7 +99,7 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-shots')).toContainText('Turn into video');
     await page.locator('#stsv-shots').screenshot({ path: `${shots}/storyboard-1.png` });
 
-    await page.getByRole('button', { name: 'Review' }).click();
+    await page.getByRole('button', { name: 'Review', exact: true }).click();
     await expect(page.locator('#stsv-review-empty')).toContainText('No clip yet');
     await page.locator('[data-step-jump="generate"]').click();
     await expect(page.locator('#stsv-connection-tests')).toContainText('Test ComfyUI');

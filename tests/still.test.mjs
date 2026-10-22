@@ -137,4 +137,7 @@ test('panels scroll on their own and the price line stays compact', () => {
     assert.match(panel, /id="stsv-cost"/);
     assert.match(lock, /Generating keyframe/);
     assert.match(readme, /Where do my videos show up\?/);
+    assert.match(panel, /Your clip is in Review — attach it to the chat/);
+    assert.match(panel, /id="stsv-cancel"/);
+    assert.match(css, /\.stsv-footer-actions/);
 });
