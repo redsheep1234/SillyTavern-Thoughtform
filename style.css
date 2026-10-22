@@ -214,12 +214,17 @@
     flex: 0 0 auto;
 }
 
+.stsv-cost-details:not([open]) > :not(summary) {
+    display: none !important;
+}
+
 .stsv-cost-details p {
     position: absolute;
+    box-sizing: border-box;
     right: 12px;
-    bottom: 56px;
+    bottom: 104px;
     z-index: 3;
-    width: min(420px, 70vw);
+    width: min(420px, calc(100% - 24px));
     max-height: 8rem;
     margin: 0;
     padding: 8px 10px;
