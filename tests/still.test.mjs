@@ -190,7 +190,8 @@ test('an OpenRouter key selects Gemini until a picture model is chosen', () => {
 });
 
 test('a picture model says which key is missing', () => {
-    assert.match(missingImageKey({ imageModel: 'google/gemini-2.5-flash-image', openrouterKey: '' }).text, /OpenRouter key/);
+    assert.match(missingImageKey({ imageModel: 'google/gemini-2.5-flash-image', openrouterKey: '' }).text, /needs an OpenRouter key/);
+    assert.match(missingImageKey({ imageModel: 'fal-ai/flux-pro/kontext/multi', falKey: '' }).text, /needs a fal\.ai key/);
     assert.equal(missingImageKey({ imageModel: 'google/gemini-2.5-flash-image', openrouterKey: 'k' }), null);
     assert.match(missingImageKey({ imageModel: 'fal-ai/flux-pro/kontext/multi', falKey: ' ' }).text, /fal\.ai key/);
     assert.equal(missingImageKey({ imageModel: 'mock', openrouterKey: '' }), null);

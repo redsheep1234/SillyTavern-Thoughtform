@@ -30,8 +30,12 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-warn-pictures')).toContainText('text card');
     await page.locator('#stsv-picture-provider').selectOption('openrouter');
     await expect(page.locator('#stsv-image-model')).toHaveValue('google/gemini-2.5-flash-image');
-    await expect(page.locator('[data-task-warn="pictures"] [data-image-key]')).toContainText('OpenRouter key');
-    await page.locator('[data-task-warn="pictures"] [data-act="open-image-key"]').click();
+    const pictureWarn = page.locator('#stsv-warn-pictures');
+    await expect(pictureWarn).toContainText('needs an OpenRouter key');
+    await expect(pictureWarn.getByRole('button', { name: 'Add the key' })).toHaveCount(1);
+    const pictureCopy = await page.locator('tr[data-task="pictures"], tr[data-task-warn="pictures"]').allInnerTexts();
+    expect(pictureCopy.join('\n').match(/needs an OpenRouter key/g)).toHaveLength(1);
+    await pictureWarn.getByRole('button', { name: 'Add the key' }).click();
     await expect(page.locator('#stsv-settings [data-setting="openrouterKey"]')).toBeFocused();
     await page.locator('#stsv-settings [data-test-key="openrouter"]').evaluate((node) => node.click());
     await expect(page.locator('#stsv-settings [data-test-result="openrouter"]')).toContainText('No OpenRouter key yet');

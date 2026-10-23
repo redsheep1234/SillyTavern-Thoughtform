@@ -47,10 +47,15 @@ test('mock pictures warn that a suite cannot keep a likeness', () => {
 test('a picture model names the missing key and hides a saved one', () => {
     const missing = modelRows(settings({ imageModel: GEMINI_IMAGE_ID, imageModelChosen: true }));
     assert.equal(missing.find((row) => row.id === 'pictures').key.state, 'needs');
-    assert.match(missing.find((row) => row.id === 'pictures').warnings.join(' '), /OpenRouter key/);
+    assert.match(missing.find((row) => row.id === 'pictures').warnings.join(' '), /needs an OpenRouter key/);
+    assert.equal(missing.find((row) => row.id === 'pictures').warnings.length, 1);
     const ready = modelRows(settings({ imageModel: GEMINI_IMAGE_ID, imageModelChosen: true, openrouterKey: 'sk-or-secretvalue' }));
     assert.equal(ready.find((row) => row.id === 'pictures').key.state, 'ok');
     assert.equal(ready.find((row) => row.id === 'pictures').warnings.some((text) => /OpenRouter key/.test(text)), false);
+    const video = modelRows(settings({ provider: 'openrouter' }));
+    assert.match(video.find((row) => row.id === 'video').warnings.join(' '), /needs an OpenRouter key/);
+    assert.match(modelRows(settings({ provider: 'xai' })).find((row) => row.id === 'video').warnings.join(' '), /needs an xAI key/);
+    assert.match(modelRows(settings({ provider: 'fal' })).find((row) => row.id === 'video').warnings.join(' '), /needs a fal\.ai key/);
 });
 
 test('one provider fills the tasks it can do and leaves the rest', () => {
