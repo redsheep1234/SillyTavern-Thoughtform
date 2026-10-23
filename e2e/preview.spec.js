@@ -341,11 +341,11 @@ test('a mock suite is restored after refresh and delete removes the file', async
     expect(after).toBe(before);
     page.once('dialog', (dialog) => dialog.accept());
     await page.locator('#stsv-jump-expressions').getByRole('button', { name: 'Delete picture' }).last().click();
-    await expect.poll(async () => page.evaluate(() => {
+    await expect.poll(async () => page.evaluate((previous) => {
         const saved = JSON.parse(localStorage.getItem('thoughtform-preview-settings') || '{}');
         const files = JSON.parse(localStorage.getItem('thoughtform-preview-files') || '{}');
         const sera = Object.values(saved.settings?.library?.records || {}).find((item) => item.name === 'Sera Voss');
         const paths = (sera?.images || []).map((image) => image.file).filter((file) => String(file || '').startsWith('user/files/'));
-        return paths.length < after && paths.every((file) => files[file]);
-    })).toBe(true);
+        return paths.length < previous && paths.every((file) => files[file]);
+    }, after)).toBe(true);
 });
