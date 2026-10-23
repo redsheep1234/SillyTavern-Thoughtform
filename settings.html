@@ -6,27 +6,20 @@
         </div>
         <div class="inline-drawer-content">
             <p>Keys live in SillyTavern's <code>settings.json</code> and in this browser. Treat them like passwords. The film icon beside Send, the extensions menu, and <code>/thoughtform</code> open the panel.</p>
-            <h4>Shot list</h4>
-            <label>Source
-                <select class="text_pole" data-setting="llmSource">
-                    <option value="sillytavern">SillyTavern's connected model</option>
-                    <option value="openrouter">OpenRouter</option>
-                    <option value="openai">OpenAI-compatible endpoint</option>
-                </select>
-            </label>
+            <h4>Models</h4>
+            <p>Pictures, video, the shot list, describe-a-picture, voice, lip-sync, and music are chosen together in the Thoughtform panel, on the Models tab. This page keeps the keys. A key is never written to the log.</p>
+            <h4>Keys</h4>
             <div class="stsv-key-field">
                 <label>OpenRouter API key <input class="text_pole" data-setting="openrouterKey" type="password" autocomplete="off"></label>
                 <button type="button" class="menu_button" data-test-key="openrouter">Test key</button>
                 <p class="stsv-key-result" data-test-result="openrouter" hidden></p>
             </div>
-            <label>OpenRouter text model <input class="text_pole" data-setting="openrouterTextModel" type="text" autocomplete="off"></label>
             <label>OpenAI-compatible base URL <input class="text_pole" data-setting="openaiBaseUrl" type="text" autocomplete="off"></label>
             <div class="stsv-key-field">
                 <label>OpenAI-compatible key <input class="text_pole" data-setting="openaiKey" type="password" autocomplete="off"></label>
                 <button type="button" class="menu_button" data-test-key="openai">Test key</button>
                 <p class="stsv-key-result" data-test-result="openai" hidden></p>
             </div>
-            <label>OpenAI-compatible model <input class="text_pole" data-setting="openaiModel" type="text" autocomplete="off"></label>
             <h4>Video keys</h4>
             <div class="stsv-key-field">
                 <label>xAI API key <input class="text_pole" data-setting="xaiKey" type="password" autocomplete="off"></label>
