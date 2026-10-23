@@ -74,5 +74,19 @@
             <label>Cost per second (estimate only) <input class="text_pole" data-setting="custom.costPerSecond" type="text" placeholder="0.05"></label>
             <p>Tokens: <code>{{prompt}}</code> <code>{{negative_prompt}}</code> <code>{{duration}}</code> <code>{{aspect_ratio}}</code> <code>{{resolution}}</code> <code>{{fps}}</code> <code>{{steps}}</code> <code>{{seed}}</code> <code>{{width}}</code> <code>{{height}}</code> <code>{{image_url}}</code> <code>{{disable_safety_checker}}</code> <code>{{api_key}}</code>. A value that is only a token keeps its type. Poll URLs may also use <code>{{id}}</code>.</p>
         </div>
+        <div class="inline-drawer">
+            <div class="inline-drawer-toggle inline-drawer-header">
+                <b>Suite outfit defaults</b>
+                <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+            </div>
+            <div class="inline-drawer-content">
+                <p>Used only when a picture and the card show no clothing. Empty fields fall back to the built-in line, so a prompt never goes out without clothes.</p>
+                <label>Woman <input class="text_pole" data-setting="suiteOutfitDefaults.woman" type="text"></label>
+                <label>Man <input class="text_pole" data-setting="suiteOutfitDefaults.man" type="text"></label>
+                <label>Neutral <input class="text_pole" data-setting="suiteOutfitDefaults.neutral" type="text"></label>
+                <label>Fantasy <input class="text_pole" data-setting="suiteOutfitDefaults.fantasy" type="text"></label>
+                <label>Science fiction <input class="text_pole" data-setting="suiteOutfitDefaults.scifi" type="text"></label>
+            </div>
+        </div>
     </div>
 </div>

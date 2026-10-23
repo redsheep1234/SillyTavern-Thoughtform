@@ -87,8 +87,9 @@ const context = {
     },
     SlashCommandParser: { addCommandObject() {} },
     SlashCommand: { fromProps(props) { return props; } },
-    saveSettingsDebounced() {},
-    saveMetadataDebounced() {},
+    saveSettingsDebounced() { writePreviewState(); },
+    saveMetadataDebounced() { writePreviewState(); },
+    flushExtensionSettings() { writePreviewState(); },
     saveChat: async () => {},
     getRequestHeaders: () => ({ 'Content-Type': 'application/json' }),
     humanizedDateTime: () => '21 October 2026',
@@ -158,13 +159,59 @@ chat.forEach((message, index) => {
 });
 
 const nativeFetch = window.fetch.bind(window);
+const PREVIEW_STATE = 'thoughtform-preview-settings';
+const PREVIEW_FILES = 'thoughtform-preview-files';
+
+function readPreviewJson(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key) || 'null');
+    } catch {
+        return null;
+    }
+}
+
+function writePreviewState() {
+    localStorage.setItem(PREVIEW_STATE, JSON.stringify({
+        settings: context.extensionSettings.scene_video,
+        metadata: context.chatMetadata,
+    }));
+}
+
+context.saveSettingsDebounced.flush = writePreviewState;
+context.saveMetadataDebounced.flush = writePreviewState;
+
+const storedPreview = readPreviewJson(PREVIEW_STATE);
+if (storedPreview?.settings) context.extensionSettings.scene_video = storedPreview.settings;
+if (storedPreview?.metadata) context.chatMetadata = storedPreview.metadata;
+
 window.fetch = async (url, options) => {
     const target = String(url);
     if (target.includes('/api/files/upload')) {
-        return new Response(JSON.stringify({ path: 'user/files/thoughtform.mp4' }), {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const name = body.name || `thoughtform-${Date.now()}.jpg`;
+        const path = `user/files/${name}`;
+        const files = readPreviewJson(PREVIEW_FILES) || {};
+        files[path] = body.data || '';
+        localStorage.setItem(PREVIEW_FILES, JSON.stringify(files));
+        return new Response(JSON.stringify({ path, name }), {
             status: 200,
             headers: { 'content-type': 'application/json' },
         });
+    }
+    if (target.includes('/api/files/delete')) {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const files = readPreviewJson(PREVIEW_FILES) || {};
+        delete files[String(body.path || '').replace(/^\//, '')];
+        localStorage.setItem(PREVIEW_FILES, JSON.stringify(files));
+        return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } });
+    }
+    if (target.includes('/user/files/')) {
+        const path = target.replace(/^https?:\/\/[^/]+/i, '').replace(/^\//, '').split('?')[0];
+        const files = readPreviewJson(PREVIEW_FILES) || {};
+        const data = files[path];
+        if (!data) return new Response('missing', { status: 404 });
+        const bytes = Uint8Array.from(atob(data), (char) => char.charCodeAt(0));
+        return new Response(bytes, { status: 200, headers: { 'content-type': 'image/jpeg' } });
     }
     if (target.includes('/api/sprites/upload')) {
         return new Response(JSON.stringify({ path: 'sprites/neutral.png' }), {
@@ -183,7 +230,9 @@ function tinyPng() {
     return new Blob([bytes], { type: 'image/png' });
 }
 
-context.extensionSettings.scene_video = { provider: 'mock', imageModel: 'mock', debug: false };
+if (!context.extensionSettings.scene_video) {
+    context.extensionSettings.scene_video = { provider: 'mock', imageModel: 'mock', debug: false };
+}
 window.SillyTavern = { getContext: () => context };
 window.$ = (element) => element;
 
@@ -196,6 +245,11 @@ function seedSeraBoard() {
     const library = context.extensionSettings.scene_video.library;
     const record = Object.values(library.records).find((item) => item.name === 'Sera Voss');
     if (!record) return;
+    const seeded = (record.images || []).some((image) => String(image.id || '').startsWith('demo-'));
+    if (seeded) {
+        if (!record.appearance) record.appearance = 'Short silver bob, amber eyes, dark green raincoat. Fixture character, not a real person.';
+        return;
+    }
     const stills = [
         ['neutral', ['expression', 'face'], 'neutral', ''],
         ['smile', ['expression', 'face'], 'joy', ''],
@@ -235,3 +289,20 @@ function seedSeraBoard() {
     record.defaultOutfitId = '';
     record.appearance = 'Short silver bob, amber eyes, dark green raincoat. Fixture character, not a real person.';
 }
+
+function showStoredFiles() {
+    document.querySelectorAll('img').forEach((img) => {
+        const src = img.getAttribute('src') || '';
+        if (!src.includes('/user/files/') || img.dataset.stored === '1') return;
+        const path = src.replace(/^\//, '').split('?')[0];
+        const files = readPreviewJson(PREVIEW_FILES) || {};
+        if (!files[path]) return;
+        img.dataset.stored = '1';
+        img.dataset.file = path;
+        img.src = `data:image/jpeg;base64,${files[path]}`;
+    });
+}
+
+const storedWatch = new MutationObserver(() => showStoredFiles());
+storedWatch.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+showStoredFiles();

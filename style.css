@@ -908,6 +908,34 @@ section[hidden] {
     margin: 12px 0 8px;
 }
 
+.stsv-outfit-line {
+    margin: 6px 0;
+    font-size: 0.9rem;
+}
+
+.stsv-suite-outfit-edit {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 8px;
+}
+
+.stsv-bin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    min-width: 1.8rem;
+    padding: 2px;
+}
+
+.stsv-restore {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
 .stsv-expr-done {
     display: flex;
     flex-wrap: wrap;

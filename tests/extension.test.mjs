@@ -257,6 +257,8 @@ test('settings pick up new provider fields', () => {
     assert.equal(settings.provider, 'xai');
     assert.equal(settings.xaiModel, 'grok-imagine-video-1.5-lite');
     assert.equal(typeof settings.custom.body, 'string');
+    assert.match(settings.suiteOutfitDefaults.woman, /singlet/);
+    assert.match(settings.suiteOutfitDefaults.neutral, /t-shirt/);
 });
 
 test('xfade offset and frame snap', () => {

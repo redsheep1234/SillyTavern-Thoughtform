@@ -268,7 +268,14 @@ test('expression and turnaround cards share the picture actions', async ({ page 
     await page.getByRole('button', { name: 'Cast and look' }).click();
     await expect(page.locator('.stsv-guide').getByRole('button', { name: 'Describe from picture' })).toBeVisible();
     await page.locator('#stsv-focus-board').selectOption({ label: 'Sera Voss' });
+    await expect(page.locator('#stsv-suite-outfit')).toContainText('dark green raincoat');
+    await expect(page.locator('#stsv-suite-outfit').getByRole('button', { name: 'change' })).toBeVisible();
+    await expect(page.locator('[data-act="vary-outfit"]')).not.toBeChecked();
     const expressions = page.locator('#stsv-jump-expressions');
+    await expect(expressions.getByRole('button', { name: 'Redo — wrong outfit' }).first()).toBeVisible();
+    await expect(expressions.getByRole('button', { name: 'Delete picture' }).first()).toBeVisible();
+    await expect(expressions.getByRole('button', { name: 'Clear all pictures' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start this character over' })).toBeVisible();
     await expect(expressions.getByRole('button', { name: 'Redo', exact: true }).first()).toBeVisible();
     await expect(expressions.getByRole('button', { name: 'More', exact: true }).first()).toBeVisible();
     await expect(expressions.getByRole('button', { name: 'Main picture' }).first()).toBeVisible();
@@ -301,4 +308,44 @@ test('expression and turnaround cards share the picture actions', async ({ page 
     await page.locator('#stsv-roster [data-act="open-board"][data-name="Sera Voss"]').click();
     await expect(page.locator('#stsv-char-look')).not.toHaveAttribute('open');
     await expect(page.locator('#stsv-look-settings')).not.toHaveAttribute('open');
+});
+
+test('a mock suite is restored after refresh and delete removes the file', async ({ page }) => {
+    await page.goto('http://127.0.0.1:43123/dev/preview.html');
+    await page.getByRole('button', { name: 'Cast and look' }).click();
+    await page.locator('#stsv-focus-board').selectOption({ label: 'Sera Voss' });
+    await page.locator('#stsv-jump-suite').scrollIntoViewIfNeeded();
+    await page.locator('#stsv-suite-outfit').screenshot({ path: `${shots}/outfit-1.png` });
+    await page.locator('#stsv-jump-suite').getByRole('button', { name: 'Build suite' }).click();
+    const confirm = page.locator('.stsv-confirm-pop');
+    await expect(confirm).toBeVisible();
+    await confirm.getByRole('button', { name: 'Continue' }).click();
+    await expect.poll(async () => page.evaluate(() => {
+        const saved = JSON.parse(localStorage.getItem('thoughtform-preview-settings') || '{}');
+        const sera = Object.values(saved.settings?.library?.records || {}).find((item) => item.name === 'Sera Voss');
+        return (sera?.images || []).filter((image) => String(image.file || '').startsWith('user/files/')).length;
+    }), { timeout: 60000 }).toBeGreaterThan(3);
+    const before = await page.evaluate(() => {
+        const saved = JSON.parse(localStorage.getItem('thoughtform-preview-settings') || '{}');
+        const sera = Object.values(saved.settings?.library?.records || {}).find((item) => item.name === 'Sera Voss');
+        return (sera?.images || []).filter((image) => String(image.file || '').startsWith('user/files/')).length;
+    });
+    await page.reload();
+    await page.getByRole('button', { name: 'Cast and look' }).click();
+    await expect(page.locator('#stsv-restored')).toContainText(/Restored \d+ pictures from your last session/);
+    const after = await page.evaluate(() => {
+        const saved = JSON.parse(localStorage.getItem('thoughtform-preview-settings') || '{}');
+        const sera = Object.values(saved.settings?.library?.records || {}).find((item) => item.name === 'Sera Voss');
+        return (sera?.images || []).filter((image) => String(image.file || '').startsWith('user/files/')).length;
+    });
+    expect(after).toBe(before);
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.locator('#stsv-jump-expressions').getByRole('button', { name: 'Delete picture' }).last().click();
+    await expect.poll(async () => page.evaluate(() => {
+        const saved = JSON.parse(localStorage.getItem('thoughtform-preview-settings') || '{}');
+        const files = JSON.parse(localStorage.getItem('thoughtform-preview-files') || '{}');
+        const sera = Object.values(saved.settings?.library?.records || {}).find((item) => item.name === 'Sera Voss');
+        const paths = (sera?.images || []).map((image) => image.file).filter((file) => String(file || '').startsWith('user/files/'));
+        return paths.length < after && paths.every((file) => files[file]);
+    })).toBe(true);
 });
