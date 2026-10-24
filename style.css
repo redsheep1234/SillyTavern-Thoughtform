@@ -914,6 +914,30 @@ section[hidden] {
     font-size: 0.9rem;
 }
 
+.stsv-body-lock {
+    margin: 8px 0 4px;
+}
+
+.stsv-body-ref {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.stsv-body-ref > label {
+    flex: 1 1 12rem;
+    min-width: 0;
+}
+
+.stsv-char-head .stsv-body-thumb,
+.stsv-body-thumb {
+    width: 64px;
+    height: 84px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 .stsv-suite-outfit-edit {
     display: grid;
     gap: 8px;

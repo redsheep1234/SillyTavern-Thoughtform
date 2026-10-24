@@ -103,6 +103,13 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-board')).toContainText('Aki Vale');
     await expect(page.locator('.stsv-guide [data-field="mustKeep"]')).toHaveValue(/teal braid/i);
     await expect(page.locator('.stsv-guide [data-field="mayChange"]')).toHaveValue('outfit, pose');
+    const bodyLine = page.locator('.stsv-guide [data-field="bodyLine"]');
+    await expect(bodyLine).toBeVisible();
+    await expect(bodyLine).toHaveAttribute('placeholder', 'athletic, narrow waist, long legs');
+    await expect(page.locator('.stsv-guide')).toContainText("The character's figure, not their clothes");
+    await expect(page.locator('.stsv-guide').getByLabel('Body reference')).toBeVisible();
+    await bodyLine.fill('athletic, narrow waist, long legs');
+    await expect(bodyLine).toHaveValue('athletic, narrow waist, long legs');
     await expect(page.locator('.stsv-guide').getByRole('button', { name: 'Describe from picture' })).toBeVisible();
     await expect(page.locator('[data-target="stsv-jump-board"]')).toHaveText('All pictures');
     await expect(page.locator('[data-target="stsv-jump-suite"]')).toHaveText('Build suite');
