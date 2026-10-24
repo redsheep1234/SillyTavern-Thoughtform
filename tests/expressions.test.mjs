@@ -159,7 +159,72 @@ test('the Full quote and a copied result show the free copy and Make unique', ()
     assert.match(html, /28 expressions, about \d+ new pictures \(copies are free\)/);
     assert.match(html, /copy of joy/);
     assert.match(html, /data-act="make-unique"/);
+    assert.match(html, /id="stsv-suite-run"/);
+    assert.match(html, /The suite is shown once, under Expressions and Turnaround/);
     assert.match(html, /data-extra="determined"/);
     assert.match(html, /data-extra="tired"/);
     assert.doesNotMatch(html, /data-extra="determined"[^>]*checked/);
+});
+
+test('the working suite is drawn once, and a file-backed still still exports', () => {
+    const record = {
+        key: 'c',
+        name: 'Aki',
+        kind: 'character',
+        appearance: 'amber eyes',
+        images: [
+            { id: 'joy', url: '/joy.jpg', tags: ['expression'], stLabel: 'joy', label: 'joy', source: 'generated', review: 'approved' },
+            { id: 'love', url: '/love.jpg', tags: ['expression'], stLabel: 'love', label: 'love', copyOf: 'joy', source: 'generated', review: 'unreviewed' },
+            { id: 'wide', url: '/wide.jpg', tags: ['expression'], stLabel: 'joy', label: 'Full frame', frame: 'wide', source: 'generated' },
+            { id: 'side', url: '/side.jpg', tags: ['turnaround'], label: 'side', source: 'generated' },
+            { id: 'dress', url: '/dress.jpg', source: 'inspiration', role: 'outfit', label: 'Outfit' },
+        ],
+        outfits: [],
+        primaryId: 'joy',
+    };
+    const html = renderBoard({
+        personas: [],
+        characters: [record],
+        places: [],
+        proposals: [],
+        links: {},
+        allBoards: [record],
+        boardFor: () => null,
+        forms: {},
+        studio: {
+            stage: 'results',
+            recordKey: 'c',
+            items: [
+                { id: 'joy', imageId: 'joy', label: 'joy', stLabel: 'joy', dataUrl: '/joy.jpg', tags: ['expression'], prompt: 'Joy.', approved: true },
+                { id: 'love', imageId: 'love', label: 'love', stLabel: 'love', copyOf: 'joy', dataUrl: '/love.jpg', tags: ['expression'], prompt: 'Love.' },
+                { label: 'fear', stLabel: 'fear', dataUrl: '', tags: ['expression'], prompt: 'Fear.' },
+                { label: 'pride', stLabel: 'pride', copyOf: 'joy', dataUrl: 'data:image/png,unparked', tags: ['expression'], prompt: 'Pride.' },
+            ],
+        },
+        imageModel: 'mock',
+        suitePreset: 'quick',
+        expressionList: '',
+        expressionExtras: [],
+        activeName: 'Aki',
+        focusKey: 'c',
+    });
+    const bar = html.slice(html.indexOf('id="stsv-suite-run"'), html.indexOf('id="stsv-jump-expressions"'));
+    const expressions = html.slice(html.indexOf('id="stsv-jump-expressions"'), html.indexOf('id="stsv-jump-turn"'));
+    const board = html.slice(html.indexOf('id="stsv-jump-board"'), html.indexOf('id="stsv-jump-suite"'));
+    const inspire = html.slice(html.indexOf('id="stsv-jump-inspire"'), html.indexOf('id="stsv-jump-board"'));
+    assert.equal((expressions.match(/\/joy\.jpg/g) || []).length, 1);
+    assert.equal((expressions.match(/\/love\.jpg/g) || []).length, 1);
+    assert.match(expressions, /data-act="make-unique"/);
+    assert.doesNotMatch(bar, /\/joy\.jpg/);
+    assert.doesNotMatch(bar, /\/love\.jpg/);
+    assert.match(bar, /fear — Generating/);
+    assert.match(bar, /data:image\/png,unparked/);
+    assert.equal((html.match(/data:image\/png,unparked/g) || []).length, 1);
+    assert.doesNotMatch(board, /\/joy\.jpg/);
+    assert.doesNotMatch(board, /\/love\.jpg/);
+    assert.doesNotMatch(board, /\/side\.jpg/);
+    assert.doesNotMatch(board, /\/dress\.jpg/);
+    assert.match(board, /\/wide\.jpg/);
+    assert.match(inspire, /\/dress\.jpg/);
+    assert.match(html, /The suite is shown once, under Expressions and Turnaround/);
 });

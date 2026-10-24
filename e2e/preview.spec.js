@@ -402,3 +402,63 @@ test('a picture opens large enough to check before it is saved', async ({ page }
     expect(sheet.y + sheet.height).toBeLessThanOrEqual(dialog.y + dialog.height + 1);
     await preview.screenshot({ path: `${shots}/preview-1.png` });
 });
+
+test('approved expression stills download and upload, and the suite is not drawn twice', async ({ page }) => {
+    await page.goto('http://127.0.0.1:43123/dev/preview.html');
+    await page.getByRole('button', { name: 'Cast and look' }).click();
+    const guide = page.locator('.stsv-guide');
+    await guide.getByRole('button', { name: 'Download expression zip' }).click();
+    await expect(page.locator('#stsv-banner')).toContainText('Approve an expression still');
+
+    await page.evaluate(() => {
+        const library = window.SillyTavern.getContext().extensionSettings.scene_video.library;
+        const aki = Object.values(library.records).find((item) => item.name === 'Aki Vale');
+        aki.images.push({
+            id: 'export-joy',
+            dataUrl: '',
+            url: '/docs/examples/sera-smile.jpg',
+            file: 'docs/examples/sera-smile.jpg',
+            tags: ['expression', 'face'],
+            label: 'joy',
+            stLabel: 'joy',
+            source: 'generated',
+            review: 'approved',
+            approved: true,
+        });
+    });
+    await page.locator('#stsv-focus-board').selectOption({ label: 'Sera Voss' });
+    await page.locator('#stsv-focus-board').selectOption({ label: 'Aki Vale' });
+    await expect(guide.locator('#stsv-jump-expressions')).toContainText('joy');
+    await expect(guide.locator('#stsv-jump-board img[src*="sera-smile"]')).toHaveCount(0);
+
+    const saveZip = async () => {
+        const [download] = await Promise.all([
+            page.waitForEvent('download'),
+            guide.getByRole('button', { name: 'Download expression zip' }).click(),
+        ]);
+        expect(download.suggestedFilename()).toBe('Aki Vale-expressions.zip');
+        const file = await download.path();
+        const text = fs.readFileSync(file).toString('latin1');
+        expect(text.startsWith('PK')).toBe(true);
+        expect(text).toContain('Aki Vale/joy.');
+        return download;
+    };
+    await saveZip();
+    await saveZip();
+    await expect(page.locator('#stsv-status')).toContainText('Downloaded Aki Vale-expressions.zip');
+    await expect(page.locator('#stsv-banner')).toBeHidden();
+
+    page.on('dialog', (dialog) => dialog.accept());
+    await guide.getByRole('button', { name: 'Export to SillyTavern expressions' }).click();
+    await expect(page.locator('#stsv-status')).toContainText(/Saved/);
+    await expect(page.locator('#stsv-status')).toContainText('joy');
+    await expect(page.locator('#stsv-banner')).toBeHidden();
+
+    await page.locator('#stsv-focus-board').selectOption({ label: 'Sera Voss' });
+    const sera = page.locator('.stsv-guide');
+    await expect(sera.locator('#stsv-jump-expressions img[src*="sera-angry"]')).toHaveCount(1);
+    await expect(sera.locator('#stsv-jump-board img[src*="sera-angry"]')).toHaveCount(0);
+    await expect(sera.locator('#stsv-jump-board img[src*="sera-turn-side"]')).toHaveCount(0);
+    await expect(sera.locator('#stsv-jump-board img[src*="sera-coral"]')).toHaveCount(1);
+    await expect(sera.locator('#stsv-jump-export img')).toHaveCount(0);
+});

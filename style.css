@@ -1026,6 +1026,27 @@ section[hidden] {
     font-weight: 600;
 }
 
+.stsv-suite-bar {
+    margin: 10px 0 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--SmartThemeBorderColor, #3c3426);
+    border-radius: 12px;
+}
+
+.stsv-suite-pending {
+    margin: 6px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.stsv-suite-pending li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 4px 0;
+}
+
 .stsv-drop {
     display: grid;
     place-items: center;

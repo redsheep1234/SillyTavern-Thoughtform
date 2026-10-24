@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { zipExpressionSet } from '../lib/sprites.js';
+import { buildStoredZip, zipExpressionSet } from '../lib/sprites.js';
 
 test('an expression zip uses SillyTavern file names', () => {
     const png = btoa('png-bytes');
@@ -20,4 +20,16 @@ test('an expression zip uses SillyTavern file names', () => {
     assert.match(text, /png-bytes/);
     assert.equal(bytes[0], 0x50);
     assert.equal(bytes[1], 0x4b);
+});
+
+test('a stored zip holds a real-size picture without blowing the stack', () => {
+    const data = new Uint8Array(200000);
+    data[0] = 7;
+    data[199999] = 9;
+    const zip = buildStoredZip([{ name: 'Sera/joy.png', bytes: data }]);
+    assert.equal(zip[0], 0x50);
+    assert.equal(zip[1], 0x4b);
+    assert.ok(zip.length > data.length);
+    assert.ok(Buffer.from(zip).includes(Buffer.from(data.subarray(0, 1))));
+    assert.equal(Buffer.from(zip).includes(Buffer.from([7, 0, 0, 0])), true);
 });
