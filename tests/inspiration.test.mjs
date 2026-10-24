@@ -47,11 +47,11 @@ test('expressions and close-ups use the identity face and hair, not a stranger',
     const record = cast();
     for (const job of ['expression', 'closeup']) {
         const picked = selectJobReferences(record, { job });
-        assert.deepEqual(picked.images.map((image) => image.id), ['ava', 'hair']);
-        assert.equal(picked.used, 'Used: avatar, Hair photo');
-        assert.match(picked.useNote, /second image only for the hair/i);
-        assert.match(picked.useNote, /face from the first image/i);
+        assert.deepEqual(picked.images.map((image) => image.id), ['ava']);
+        assert.equal(picked.used, 'Used: avatar');
         assert.match(picked.useNote, /Must keep wins/i);
+        assert.equal(picked.images.some((image) => image.id === 'hair'), false);
+        assert.equal(picked.images.some((image) => image.id === 'body' || image.id === 'dress' || image.id === 'pose'), false);
         assert.equal(picked.images.some((image) => image.id === 'stranger'), false);
     }
 });
@@ -133,6 +133,29 @@ test('an expression redo sends the main avatar before an untagged full-body uplo
     const turn = selectJobReferences(named, { job: 'expression', medium: 'live-action' });
     assert.equal(turn.images[0]?.id, 'ava');
     assert.equal(turn.images.some((image) => image.id === 'turn'), false);
+});
+
+test('an expression sends the main picture and at most two approved portraits', () => {
+    const record = {
+        name: 'Sera',
+        kind: 'character',
+        primaryId: 'ava',
+        images: [
+            { id: 'ava', source: 'avatar', url: 'ava', tags: ['face'], label: 'Avatar' },
+            { id: 'turn', source: 'generated', url: 'turn', tags: ['turnaround', 'full body'], approved: true },
+            { id: 'outfit', source: 'generated', url: 'outfit', tags: ['outfit', 'full body'], outfitId: 'coral', approved: true },
+            { id: 'pose', source: 'upload', url: 'pose', tags: ['pose'], label: 'pose.png' },
+            { id: 'joy', source: 'generated', url: 'joy', tags: ['expression', 'face'], stLabel: 'joy', approved: true, aspectRatio: '3:4' },
+            { id: 'sad', source: 'generated', url: 'sad', tags: ['expression', 'face'], stLabel: 'sadness', approved: true, aspectRatio: '3:4' },
+            { id: 'anger', source: 'generated', url: 'anger', tags: ['expression'], stLabel: 'anger', review: 'unreviewed', aspectRatio: '3:4' },
+            { id: 'wide', source: 'generated', url: 'wide', tags: ['expression'], frame: 'wide', stLabel: 'joy', approved: true },
+            { id: 'crop', source: 'generated', url: 'crop', tags: ['expression', 'face'], portrait: true, cropOf: 'wide', frame: 'portrait', stLabel: 'joy', approved: true, aspectRatio: '3:4' },
+        ],
+    };
+    const picked = selectJobReferences(record, { job: 'expression', lockOutfit: true });
+    assert.deepEqual(picked.images.map((image) => image.id), ['ava', 'crop', 'joy']);
+    assert.match(picked.useNote, /neckline/i);
+    assert.match(picked.useNote, /Do not change clothing/);
 });
 
 test('the avatar wins when an identity face photo is also on the board', () => {

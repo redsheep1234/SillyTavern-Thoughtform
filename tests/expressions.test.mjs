@@ -51,11 +51,15 @@ test('full draws the distinct faces and copies the near-duplicates for free', ()
     for (const name of DRAWN) {
         const item = faces.find((entry) => entry.stLabel === name);
         assert.equal(item.copyOf, '', name);
-        assert.match(item.prompt, /Portrait/);
+        assert.match(item.prompt, /head-and-shoulders portrait/i);
     }
-    assert.match(faces.find((item) => item.stLabel === 'desire').prompt, /waist-up/i);
-    assert.match(faces.find((item) => item.stLabel === 'desire').prompt, /Do not crop to the face/i);
-    assert.doesNotMatch(faces.find((item) => item.stLabel === 'desire').prompt, /face only/i);
+    const desire = faces.find((item) => item.stLabel === 'desire').prompt;
+    assert.match(desire, /face is clearly dominant/i);
+    assert.match(desire, /neckline/i);
+    assert.match(desire, /3:4/);
+    assert.doesNotMatch(desire, /waist-up/i);
+    assert.doesNotMatch(desire, /Do not crop to the face/i);
+    assert.doesNotMatch(desire, /face only/i);
     assert.match(faces.find((item) => item.stLabel === 'admiration').prompt, /adoring/i);
     for (const [name, source] of Object.entries(COPIES)) {
         assert.equal(faces.find((item) => item.stLabel === name).copyOf, source, name);

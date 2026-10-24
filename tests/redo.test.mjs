@@ -177,8 +177,10 @@ test('an expression redo asks for a portrait and a different seed changes the ca
         { label: 'happy', tags: ['expression'], prompt: 'smile' },
         { vary: true, seed: 7 },
     );
-    assert.match(prompt, /Portrait framing/);
+    assert.match(prompt, /head-and-shoulders portrait/i);
+    assert.match(prompt, /neckline/i);
     assert.match(prompt, /3:4/);
+    assert.doesNotMatch(prompt, /waist-up/i);
     assert.match(prompt, /Variation 7/);
     const base = { prompt: 'same', modelId: 'mock', aspectRatio: '3:4' };
     assert.notEqual(stillAssetKey({ ...base, seed: 1 }), stillAssetKey({ ...base, seed: 2 }));

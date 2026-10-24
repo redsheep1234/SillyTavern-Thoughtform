@@ -59,8 +59,9 @@ test('remix and a single still stay pending until approval', () => {
     assert.match(draft.prompt, /about 50s/);
     assert.equal(mum.images[0].dataUrl, 'data:image/png,old');
     assert.match(replacementPrompt(mum, mum.images[0]), /Expression: happy/);
-    assert.match(replacementPrompt(mum, mum.images[0]), /Portrait framing/);
+    assert.match(replacementPrompt(mum, mum.images[0]), /head-and-shoulders portrait/i);
     assert.match(replacementPrompt(mum, mum.images[0]), /3:4/);
+    assert.doesNotMatch(replacementPrompt(mum, mum.images[0]), /Do not crop to the face/i);
     assert.match(replacementPrompt(mum, mum.images[0], { vary: true, seed: 42 }), /Variation 42/);
     updateOutfitText(mum, 'coat', 'linen coat');
     assert.equal(mum.outfits[0].description, 'linen coat');
