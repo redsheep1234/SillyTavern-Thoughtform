@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { selectJobReferences } from '../lib/inspiration.js';
+import { replacementPrompt } from '../lib/relations.js';
 import { EXPRESSION_FRAMING, planReferenceSet, TURNAROUND } from '../lib/refset.js';
 import {
     clothingClause,
     defaultOutfitFor,
+    locksOutfit,
     resolveSetting,
     seedSuiteOutfit,
     suiteOutfitLabel,
@@ -73,7 +75,7 @@ test('fantasy and science fiction stay simple, and one dragon is not a genre', (
     assert.match(defaultOutfitFor(dragon).text, /athletic wear/);
 });
 
-test('expressions and turnarounds lock one outfit and poses may vary', () => {
+test('expressions, turnarounds, and poses lock one outfit', () => {
     const plan = planReferenceSet({
         expressions: [
             { id: 'happy', label: 'happy', st: 'joy', line: 'Happy expression, a genuine smile.' },
@@ -105,17 +107,31 @@ test('expressions and turnarounds lock one outfit and poses may vary', () => {
         assert.match(view.prompt, /same outfit in every image/);
     }
     const pose = plan.find((item) => item.tags.includes('pose'));
-    assert.match(pose.prompt, /Fully clothed/);
-    assert.doesNotMatch(pose.prompt, /same outfit in every image/);
+    assert.match(pose.prompt, /Fully clothed, wearing exactly: a dark green raincoat/);
+    assert.match(pose.prompt, /same outfit in every image/);
+    assert.match(pose.prompt, /Do not change clothing/);
     const loose = planReferenceSet({
         expressions: [{ id: 'happy', label: 'happy', st: 'joy', line: 'Happy expression.' }],
         includeExpressions: true,
-        includeTurnaround: false,
+        includeTurnaround: true,
+        turnaround: [TURNAROUND.find((view) => view.kind === 'pose')],
         suiteOutfit: 'a dark green raincoat',
         lockOutfit: false,
     });
     assert.match(loose[0].prompt, /Fully clothed/);
     assert.doesNotMatch(loose[0].prompt, /Do not change clothing/);
+    const loosePose = loose.find((item) => item.tags.includes('pose'));
+    assert.match(loosePose.prompt, /The outfit may vary/);
+    assert.doesNotMatch(loosePose.prompt, /same outfit in every image/);
+    const record = { varyOutfit: false, suiteOutfit: 'a light grey tee and shorts' };
+    assert.equal(locksOutfit(record, ['pose', 'full body']), true);
+    assert.equal(locksOutfit({ ...record, varyOutfit: true }, ['pose', 'full body']), false);
+    const redo = replacementPrompt(record, { label: 'sitting', tags: ['pose', 'full body'] }, {
+        lockOutfit: true,
+        suiteOutfit: record.suiteOutfit,
+    });
+    assert.match(redo, /wearing exactly: a light grey tee and shorts/);
+    assert.match(redo, /same outfit in every image/);
 });
 
 test('a locked expression sends the main picture and not a random wardrobe outfit', () => {
@@ -138,4 +154,13 @@ test('a locked expression sends the main picture and not a random wardrobe outfi
     assert.equal(named.images.some((image) => image.outfitId === 'coral'), false);
     const open = selectJobReferences(record, { job: 'turnaround', lockOutfit: false });
     assert.equal(open.images.some((image) => image.id === 'coral' || image.id === 'coat'), true);
+    const pose = selectJobReferences(record, { job: 'pose', lockOutfit: true });
+    assert.equal(pose.images[0].id, 'ava');
+    assert.equal(pose.images.some((image) => image.outfitId === 'coral'), false);
+    assert.match(pose.useNote, /Do not change clothing/);
+    const namedPose = selectJobReferences(record, { job: 'pose', lockOutfit: true, outfitId: 'raincoat' });
+    assert.equal(namedPose.images.some((image) => image.id === 'coat'), true);
+    assert.equal(namedPose.images.some((image) => image.outfitId === 'coral'), false);
+    const openPose = selectJobReferences(record, { job: 'pose', lockOutfit: false });
+    assert.equal(openPose.images.some((image) => image.id === 'coral' || image.id === 'coat'), true);
 });
