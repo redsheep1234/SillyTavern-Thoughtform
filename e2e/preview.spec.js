@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
+import { openZip } from '../tests/helpers/zip-open.mjs';
 
 const shots = 'test-results/screenshots';
 
@@ -438,9 +439,11 @@ test('approved expression stills download and upload, and the suite is not drawn
         ]);
         expect(download.suggestedFilename()).toBe('Aki Vale-expressions.zip');
         const file = await download.path();
-        const text = fs.readFileSync(file).toString('latin1');
-        expect(text.startsWith('PK')).toBe(true);
-        expect(text).toContain('Aki Vale/joy.');
+        const opened = openZip(fs.readFileSync(file));
+        const joy = opened.find((entry) => entry.name === 'Aki Vale/joy.jpg' || entry.name === 'Aki Vale/joy.png');
+        expect(joy).toBeTruthy();
+        expect(joy.size).toBeGreaterThan(8);
+        expect(joy.data[0] === 0xff || joy.data[0] === 0x89).toBe(true);
         return download;
     };
     await saveZip();

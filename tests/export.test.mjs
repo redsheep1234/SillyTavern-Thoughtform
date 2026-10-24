@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { expressionFiles } from '../lib/expressions.js';
 import { expressionZipBytes, expressionZipName, spriteExportPlan, uploadExpressionSprites } from '../lib/sprites.js';
+import { openZip } from './helpers/zip-open.mjs';
 
 const png = Uint8Array.from([137, 80, 78, 71, 1, 2, 3, 4]);
 
@@ -41,13 +42,13 @@ test('an approved stored still is exported and a picture still in review is not'
             return pictureResponse();
         },
     });
-    const text = Buffer.from(bytes).toString('latin1');
     assert.equal(fetched, '/user/files/joy.jpg');
-    assert.match(text, /Sera Voss\/joy\.png/);
-    assert.doesNotMatch(text, /sadness/);
-    assert.doesNotMatch(text, /wide/);
-    assert.equal(bytes[0], 0x50);
-    assert.equal(bytes[1], 0x4b);
+    const archive = openZip(bytes);
+    const joy = archive.find((file) => file.name === 'Sera Voss/joy.png');
+    assert.ok(joy);
+    assert.deepEqual(joy.data, png);
+    assert.equal(archive.some((file) => /sadness|wide/.test(file.name)), false);
+    assert.ok(archive.every((file) => file.size > 0 && file.date[0] >= 1980));
 });
 
 test('a data URL zips without fetching, and a failed sprite upload names the expression', async () => {
@@ -87,4 +88,5 @@ test('a data URL zips without fetching, and a failed sprite upload names the exp
     const avatar = posted.body.get('avatar');
     assert.equal(avatar.type, 'image/png');
     assert.match(avatar.name, /\.png$/);
+    assert.deepEqual(new Uint8Array(await avatar.arrayBuffer()), png);
 });
