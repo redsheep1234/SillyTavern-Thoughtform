@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { defaultSettings } from '../lib/constants.js';
 import { applySameProvider, choiceLine, keyStatuses, modelRows, modelWarnings, textSettingsFor } from '../lib/models.js';
-import { GEMINI_IMAGE_ID } from '../lib/providers/image.js';
+import { GEMINI_IMAGE_ID, VENICE_IMAGE_ID } from '../lib/providers/image.js';
 import { preferStillModel } from '../lib/settings.js';
 
 function settings(extra = {}) {
@@ -91,6 +91,29 @@ test('one provider fills the tasks it can do and leaves the rest', () => {
     assert.equal(preview.ttsProvider, 'mock');
     assert.equal(preferStillModel(preview), false);
     assert.equal(preview.imageModel, 'mock');
+
+    const venice = settings({ openrouterKey: 'sk-or-secretvalue', ttsProvider: 'elevenlabs', lipSyncModel: 'fal-ai/sync-lipsync/v3' });
+    const veniceNote = applySameProvider(venice, 'venice');
+    assert.equal(venice.imageModel, VENICE_IMAGE_ID);
+    assert.equal(venice.imageModelChosen, true);
+    assert.equal(venice.provider, 'venice');
+    assert.equal(venice.veniceModel, 'wan-2.5-preview-text-to-video');
+    assert.equal(venice.llmSource, 'venice');
+    assert.equal(venice.describeSource, '');
+    assert.equal(venice.ttsProvider, 'elevenlabs');
+    assert.equal(venice.lipSyncModel, 'fal-ai/sync-lipsync/v3');
+    assert.equal(preferStillModel(venice), false);
+    assert.match(veniceNote.skipped.join(' '), /Voice stays/);
+    assert.match(veniceNote.skipped.join(' '), /Lip-sync stays/);
+    const veniceRows = modelRows(venice);
+    assert.match(veniceRows.find((row) => row.id === 'pictures').warnings.join(' '), /needs a Venice key/);
+    assert.equal(veniceRows.find((row) => row.id === 'pictures').warnings.length, 1);
+    assert.match(veniceRows.find((row) => row.id === 'video').warnings.join(' '), /needs a Venice key/);
+    assert.match(veniceRows.find((row) => row.id === 'shots').warnings.join(' '), /Shot list needs a Venice key/);
+    assert.match(veniceRows.find((row) => row.id === 'describe').warnings.join(' '), /Describe from picture needs a Venice key/);
+    assert.equal(veniceRows.find((row) => row.id === 'pictures').cost, 'Check provider');
+    assert.equal(veniceRows.find((row) => row.id === 'video').cost, 'Check provider');
+    assert.equal(keyStatuses(venice).find((item) => item.setting === 'veniceKey').text, 'Needs key');
 });
 
 test('describe a picture can follow the shot list or use its own model', () => {

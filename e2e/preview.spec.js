@@ -29,6 +29,10 @@ test('group preview walks the panel without console errors', async ({ page }) =>
     await expect(page.locator('#stsv-image-model')).toBeVisible();
     await expect(page.locator('#stsv-image-model')).toHaveValue('mock');
     await expect(page.locator('#stsv-warn-pictures')).toContainText('text card');
+    await expect(page.locator('#stsv-picture-provider option[value="venice"]')).toHaveCount(1);
+    await expect(page.locator('#stsv-video-provider option[value="venice"]')).toHaveCount(1);
+    await expect(page.locator('[aria-label="Shot list provider"] option[value="venice"]')).toHaveCount(1);
+    await expect(page.locator('#stsv-same-provider option[value="venice"]')).toHaveCount(1);
     await page.locator('#stsv-picture-provider').selectOption('openrouter');
     await expect(page.locator('#stsv-image-model')).toHaveValue('google/gemini-2.5-flash-image');
     const pictureWarn = page.locator('#stsv-warn-pictures');
@@ -272,6 +276,17 @@ test('expression and turnaround cards share the picture actions', async ({ page 
     await expect(page.locator('#stsv-same-note')).toContainText('Voice stays');
     await expect(page.locator('#stsv-picture-key')).toContainText('Needs key');
     await page.locator('.stsv-models').screenshot({ path: `${shots}/models-1.png` });
+    await page.locator('#stsv-same-provider').selectOption('venice');
+    await page.locator('#stsv-same-apply').click();
+    await expect(page.locator('#stsv-image-model')).toHaveValue('krea-v2-large');
+    await expect(page.locator('#stsv-video-provider')).toHaveValue('venice');
+    await expect(page.locator('#stsv-model')).toHaveValue('wan-2.5-preview-text-to-video');
+    await expect(page.locator('[aria-label="Shot list provider"]')).toHaveValue('venice');
+    await expect(page.locator('[aria-label="Describe a picture provider"]')).toHaveValue('');
+    await expect(page.locator('#stsv-warn-pictures')).toContainText('needs a Venice key');
+    await expect(page.locator('#stsv-warn-video')).toContainText('needs a Venice key');
+    await expect(page.locator('#stsv-warn-shots')).toContainText('Shot list needs a Venice key');
+    await expect(page.locator('#stsv-same-note')).toContainText('Lip-sync stays');
     await page.locator('#stsv-picture-provider').selectOption('mock');
     await page.getByRole('button', { name: 'Cast and look' }).click();
     await expect(page.locator('.stsv-guide').getByRole('button', { name: 'Describe from picture' })).toBeVisible();

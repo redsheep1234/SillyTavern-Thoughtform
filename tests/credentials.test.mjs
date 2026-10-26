@@ -148,7 +148,7 @@ test('Test key uses the connection check and OpenRouter status codes', async () 
 test('each settings key has a Test key button wired to the connection check', () => {
     const html = readFileSync(new URL('../settings.html', import.meta.url), 'utf8');
     const boot = readFileSync(new URL('../lib/boot.js', import.meta.url), 'utf8');
-    for (const id of ['openrouter', 'openai', 'xai', 'fal', 'replicate', 'custom']) {
+    for (const id of ['openrouter', 'venice', 'openai', 'xai', 'fal', 'replicate', 'custom']) {
         assert.match(html, new RegExp(`data-setting="[^"]*"`));
         assert.match(html, new RegExp(`data-test-key="${id}"`));
         assert.match(html, new RegExp(`data-test-result="${id}"`));

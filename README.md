@@ -24,6 +24,7 @@ You can try the whole path with no API key. The video provider and the stills pr
 Open **Extensions → Thoughtform**.
 
 - **OpenRouter API key**: paste the key, then in the panel open **Generate** and click **Refresh OpenRouter models**. That replaces the fallback prices with the live list. The same key is used if you point the shot list at OpenRouter.
+- **Venice API key**: one key for pictures, video, and the shot list. **Test key** checks it. Describe from picture uses that same key when Venice is selected there.
 - **fal.ai API key**: paste the key in the fal field. Test it with **Test fal.ai** under Generate.
 - **xAI API key**: the default hosted video route. Paste it the same way.
 - Leave the provider on **Mock** until a key is in place. A missing key stops with “add a key”, not a stack trace.
@@ -91,7 +92,7 @@ Reference stills stay in the current page session. They are scaled to a JPEG aro
 | High | same picture as Showcase | Kept so older setups still resolve |
 | Max | premium 1080p | xAI Grok Imagine Video 1.5, or Veo 3.1 on fal / OpenRouter / Replicate |
 
-A preset sets the model, resolution, frame rate, and steps for the provider you have selected. Duration stays what you set, then each provider snaps it to a length that model accepts. Changing the model, resolution, frame rate, or steps by hand switches the preset to Custom.
+A preset sets the model, resolution, frame rate, and steps for the provider you have selected. Duration stays what you set, then each provider snaps it to a length that model accepts. Changing the model, resolution, frame rate, or steps by hand switches the preset to Custom. Venice presets stay on Wan 2.5 Preview and only change the resolution (480p, 720p, or 1080p). Duration snaps to 5 or 10 seconds.
 
 Estimates are per generated second, multiplied by the shot list. Stitching is free. Unknown models say **Check provider** instead of a guessed price. Refresh OpenRouter models to replace the fallback with live `pricing_skus`.
 
@@ -116,13 +117,14 @@ Calls go from the browser when the host allows it. **Auto** tries the browser fi
 | --- | --- | --- |
 | xAI Grok Imagine | Direct | Default. `POST https://api.x.ai/v1/videos/generations`, then poll. Lite is the cheap hosted option. There is no cancel endpoint; Cancel stops polling. |
 | OpenRouter video | Direct | `POST https://openrouter.ai/api/v1/videos` for Grok Imagine, Wan 3.0, Kling 3.0, Seedance, Veo 3.1, Hailuo, and the rest of the live catalog. Refresh models after you add a key. |
+| Venice | Direct | Pictures `POST https://api.venice.ai/api/v1/image/generate` (Krea v2 Large; style references when the suite sends them and the safety checkbox maps to `safe_mode`). Video `POST /video/queue` then `POST /video/retrieve` (Wan 2.5 Preview, including a still for Animate this still). Shot list and Describe from picture use `POST /chat/completions`. One key. The price line stays **Check provider**. |
 | fal.ai | Direct | Wan 2.2, Kling 2.5 Turbo Pro, Kling v3, Hailuo 02, Veo 3.1. |
 | ComfyUI | Your machine | Unrestricted local route. See below. |
 | Mock | This page | A short title card, so you can try selection, the shot list, and download with no key. |
 | Custom API | Auto | Submit URL, poll URL, and JSON templates. Use this for Runway, Luma, or another host. |
 | Replicate | **Needs the CORS proxy** | Replicate does not allow browser calls. The panel says so when you select it. |
 
-Checked from the browser on 21 October 2026: fal, xAI, and OpenRouter accept browser calls. Replicate, Runway, and Kling's own API do not. Kling on fal, Replicate, or OpenRouter is a different host from Kling's own API.
+Checked from the browser on 21 October 2026: fal, xAI, and OpenRouter accept browser calls. Venice uses the same direct Bearer call to `api.venice.ai`. Replicate, Runway, and Kling's own API do not. Kling on fal, Replicate, or OpenRouter is a different host from Kling's own API.
 
 This extension does not call OpenAI Sora 2. That API was shut down. It also does not call the Gemini API Veo 3.1 preview, which Google scheduled to shut down on 22 October 2026 in favor of Gemini Omni Flash 1.1. Veo 3.1 can still appear as a model id on fal, OpenRouter, or Replicate. Those are those companies' routes, not the Gemini API.
 
@@ -163,6 +165,7 @@ A JSON value that is exactly `{{duration}}` stays a number. Quotes in `{{prompt}
 
 - **SillyTavern** uses `generateRaw` with a JSON schema, then retries without the schema, then `generateQuietPrompt`.
 - **OpenRouter** uses the video key and a text model (`openrouter/auto` unless you change it).
+- **Venice** uses `POST https://api.venice.ai/api/v1/chat/completions` and the Venice key. The default model is `venice-uncensored-1-2`, which can see a picture, so Describe from picture can use it too.
 - **OpenAI-compatible** uses the base URL, key, and model under Extensions → Thoughtform. A local server such as `http://127.0.0.1:5000/v1` works when it allows the browser or the proxy.
 
 The storyboard prompt tells the model the text is your fiction, including when it is mature, and to describe the picture without adding a warning or a refusal. This extension does not filter prompts or videos.
@@ -175,6 +178,7 @@ Hosted labs still apply their own rules.
 - **fal**: the safety checkbox sends `enable_safety_checker: false` for Kling 2.5 Turbo Pro and Wan 2.2, and `safety_tolerance: "6"` for fal's Veo 3.1. fal can ignore the flag unless the account is allowed to turn the checker off. Kling v3 and Hailuo have no switch in the published schema.
 - **Replicate**: Wan 2.2 fast gets `disable_safety_checker`. Kling and Veo on Replicate do not publish that switch.
 - **OpenRouter** has no global switch. The lab behind the model applies its own policy.
+- **Venice** pictures send `safe_mode: false` when the safety checkbox is off. Video has no `safe_mode` field. The model's own policy still applies.
 - **xAI** can reject a prompt and marks some outputs as moderated. It is not an unrestricted route.
 - **Custom**: put the host's own safety field in the body template if you want one.
 
@@ -208,7 +212,7 @@ If a host refuses an outfit prompt, the error names the refusal and tells you to
 
 ## Debug
 
-Turn on **Debug mode** under Generate. The log shows each job's request summary, how long it took, and provider errors in plain language with a fix to try. API keys are removed before anything is stored. **Copy diagnostics** puts the extension version, redacted settings, and the recent log on the clipboard. **Test** buttons call xAI, OpenRouter, fal, ComfyUI, the mock provider, a custom host, and Replicate.
+Turn on **Debug mode** under Generate. The log shows each job's request summary, how long it took, and provider errors in plain language with a fix to try. API keys are removed before anything is stored. **Copy diagnostics** puts the extension version, redacted settings, and the recent log on the clipboard. **Test** buttons call xAI, OpenRouter, Venice, fal, ComfyUI, the mock provider, a custom host, and Replicate.
 
 ## Troubleshooting
 
@@ -218,7 +222,7 @@ Turn on **Debug mode** under Generate. The log shows each job's request summary,
 | A face is missing from a shot | They joined later, or they are muted. Check the roster note and the "first speaks at" line in the shot-list prompt. |
 | Two people swapped clothes | Outfit names can match. The change follows the sentence that names that person. Approve a proposal before it is saved. |
 | "Add an xAI key" or 401 | Extensions → Thoughtform. Keys live in SillyTavern's settings.json and in this browser. |
-| Replicate or another host fails immediately | Turn on `enableCorsProxy: true` or start with `--corsProxy`, then restart. fal, xAI, and OpenRouter do not need the proxy. |
+| Replicate or another host fails immediately | Turn on `enableCorsProxy: true` or start with `--corsProxy`, then restart. fal, xAI, OpenRouter, and Venice do not need the proxy. |
 | ComfyUI does not answer | Start it with `--enable-cors-header *` on a machine you control. Do not publish that port. Click Test ComfyUI. On an 8GB card load LTX-2.3, not Wan 2.2 14B. Load an API-format workflow, not the canvas file. |
 | The stitch mentions SharedArrayBuffer | The extension loads single-thread ffmpeg from jsDelivr on the first multi-clip render. One clip skips ffmpeg. If the CDN is blocked, download the clips separately. |
 | Subtitles credit the wrong person | The line should read `Name: words`. Edit the dialogue box. The local split copies the chat speaker. |
